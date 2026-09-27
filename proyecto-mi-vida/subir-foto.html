@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subir Foto 📷</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/subir-foto.css">
+</head>
+<body>
+
+<div id="lluvia-petalos" class="lluvia-petalos" aria-hidden="true"></div>
+
+<nav class="nav-hojas">
+  <a href="colage.html">Nuestro colage</a>
+  <a href="carta.html">Una carta para ti</a>
+  <a href="cumpleanos.html">Cumpleaños</a>
+  <a href="aniversario.html">Aniversario</a>
+  <a href="subir-foto.html" class="activa">Subir Foto</a>
+</nav>
+
+<main class="subir-envoltorio">
+  <div id="doodle-header" class="subir-doodles"></div>
+  
+  <h1>Añadir Nuevo Recuerdo 📸</h1>
+  <p class="subir-sub">Sube tus fotos para que nuestro colage crezca con nuevos momentos inolvidables.</p>
+  
+  <form id="form-subir-foto" class="form-foto">
+    <div class="campo-form">
+      <label for="titulo">Título de la foto *</label>
+      <input type="text" id="titulo" name="titulo" placeholder="Ej: Nuestra primera cita" required>
+      <p class="ayuda">¿Qué momento captura esta foto?</p>
+    </div>
+    
+    <div class="campo-form">
+      <label for="descripcion">Descripción *</label>
+      <textarea id="descripcion" name="descripcion" rows="3" placeholder="Describe lo que pasó, cómo te sentiste..." required></textarea>
+      <p class="ayuda">Esta descripción aparecerá en el colage.</p>
+    </div>
+    
+    <div class="campo-form">
+      <label for="foto">Selecciona una foto *</label>
+      <div class="area-arrastrar" id="area-arrastrar">
+        <input type="file" id="foto" name="foto" accept="image/*" required>
+        <div class="preview-foto" id="preview-foto">
+          <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <p>Arrastra una foto aquí o haz clic</p>
+          <p class="formato-ayuda">JPG, PNG, WEBP (Max 5MB)</p>
+        </div>
+        <div class="preview-contenedor" id="preview-contenedor" style="display: none;">
+          <img id="preview-img" alt="Vista previa">
+          <button type="button" id="btn-Eliminar-preview" class="btn-eliminar">✕</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="campo-form">
+      <label for="fecha">Fecha de la foto (opcional)</label>
+      <input type="date" id="fecha" name="fecha">
+      <p class="ayuda">Si no la conoces, se usará la fecha de hoy.</p>
+    </div>
+    
+    <div class="campo-form">
+      <label for="frase">Frase de amor para esta foto</label>
+      <textarea id="frase" name="frase" rows="2" placeholder="Ej: Eres mi persona favorita en este mundo"></textarea>
+      <p class="ayuda">Esta frase aparecerá destacada en la tarjeta.</p>
+    </div>
+    
+    <div class="acciones-form">
+      <button type="submit" id="btn-subir" class="btn-primario">
+        <span>Subir Foto</span>
+        <span class="icono-btn">→</span>
+      </button>
+      <button type="button" id="btn-cancelar" class="btn-secundario">Cancelar</button>
+    </div>
+    
+    <div id="progreso-subida" class="progreso-contenedor" style="display: none;">
+      <div class="barra-progreso">
+        <div class="progreso" id="progreso"></div>
+      </div>
+      <p id="texto-progreso">Subiendo foto...</p>
+    </div>
+    
+    <div id="mensaje-resultado" class="mensaje-resultado" style="display: none;"></div>
+  </form>
+  
+  <div class="fotos-recentes">
+    <h2>Fotos Recientes</h2>
+    <div class="grid-recentes" id="grid-recentes">
+      <p class="cargando">Cargando fotos...</p>
+    </div>
+  </div>
+</main>
+
+<footer class="firma">Guardando nuestros recuerdos ✿</footer>
+
+<script src="js/doodles.js"></script>
+<script src="js/petalos.js"></script>
+<script type="module" src="js/musica.js"></script>
+<script type="module">
+  import { agregarFoto, obtenerFotos } from './js/supabase-config.js';
+
+  // Inicializar
+  document.getElementById('doodle-header').innerHTML = svgPajarito(35) + svgLirio(45) + svgPerrito(60) + svgLirio(45) + svgPajarito(35);
+  iniciarLluviaDeFlores('lluvia-petalos', 1700);
+
+  // Elementos del DOM
+  const form = document.getElementById('form-subir-foto');
+  const inputFoto = document.getElementById('foto');
+  const previewContenedor = document.getElementById('preview-contenedor');
+  const previewImg = document.getElementById('preview-img');
+  const previewFoto = document.getElementById('preview-foto');
+  const btnEliminarPreview = document.getElementById('btn-Eliminar-preview');
+  const areaArrastrar = document.getElementById('area-arrastrar');
+  const btnSubir = document.getElementById('btn-subir');
+  const btnCancelar = document.getElementById('btn-cancelar');
+  const progresoSubida = document.getElementById('progreso-subida');
+  const progreso = document.getElementById('progreso');
+  const textoProgreso = document.getElementById('texto-progreso');
+  const mensajeResultado = document.getElementById('mensaje-resultado');
+  const gridRecientes = document.getElementById('grid-recentes');
+
+  let archivoSeleccionado = null;
+
+  // Preview de imagen
+  function mostrarPreview(file) {
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImg.src = e.target.result;
+      previewContenedor.style.display = 'block';
+      previewFoto.style.display = 'none';
+      archivoSeleccionado = file;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Manejar selección de archivo
+  inputFoto.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      mostrarPreview(e.target.files[0]);
+    }
+  });
+
+  // Arrastrar y soltar
+  areaArrastrar.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    areaArrastrar.style.borderColor = 'var(--rosa-profundo)';
+    areaArrastrar.style.backgroundColor = 'rgba(232, 162, 176, 0.1)';
+  });
+
+  areaArrastrar.addEventListener('dragleave', () => {
+    areaArrastrar.style.borderColor = 'var(--rosa-suave)';
+    areaArrastrar.style.backgroundColor = 'var(--crema)';
+  });
+
+  areaArrastrar.addEventListener('drop', (e) => {
+    e.preventDefault();
+    areaArrastrar.style.borderColor = 'var(--rosa-suave)';
+    areaArrastrar.style.backgroundColor = 'var(--crema)';
+    
+    if (e.dataTransfer.files.length > 0) {
+      inputFoto.files = e.dataTransfer.files;
+      mostrarPreview(e.dataTransfer.files[0]);
+    }
+  });
+
+  // Eliminar preview
+  btnEliminarPreview.addEventListener('click', () => {
+    previewContenedor.style.display = 'none';
+    previewFoto.style.display = 'block';
+    inputFoto.value = '';
+    archivoSeleccionado = null;
+  });
+
+  // Cancelar formulario
+  btnCancelar.addEventListener('click', () => {
+    form.reset();
+    previewContenedor.style.display = 'none';
+    previewFoto.style.display = 'block';
+    archivoSeleccionado = null;
+    mensajeResultado.style.display = 'none';
+  });
+
+  // Validación del formulario
+  function validarFormulario() {
+    const titulo = document.getElementById('titulo').value.trim();
+    const descripcion = document.getElementById('descripcion').value.trim();
+    
+    if (!titulo) {
+      mostrarMensaje('Por favor, ingresa un título para la foto', 'error');
+      return false;
+    }
+    
+    if (!descripcion) {
+      mostrarMensaje('Por favor, ingresa una descripción', 'error');
+      return false;
+    }
+    
+    if (!archivoSeleccionado) {
+      mostrarMensaje('Por favor, selecciona una foto', 'error');
+      return false;
+    }
+    
+    if (archivoSeleccionado.size > 5 * 1024 * 1024) {
+      mostrarMensaje('La foto es demasiado grande (máximo 5MB)', 'error');
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Mostrar mensaje
+  function mostrarMensaje(texto, tipo) {
+    mensajeResultado.textContent = texto;
+    mensajeResultado.className = `mensaje-resultado ${tipo}`;
+    mensajeResultado.style.display = 'block';
+    
+    if (tipo === 'exito') {
+      form.reset();
+      previewContenedor.style.display = 'none';
+      previewFoto.style.display = 'block';
+      archivoSeleccionado = null;
+      cargarFotosRecientes();
+    }
+  }
+
+  // Subir foto
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    if (!validarFormulario()) return;
+    
+    const titulo = document.getElementById('titulo').value.trim();
+    const descripcion = document.getElementById('descripcion').value.trim();
+    const frase = document.getElementById('frase').value.trim();
+    
+    try {
+      // Mostrar progreso
+      progresoSubida.style.display = 'block';
+      progreso.style.width = '0%';
+      textoProgreso.textContent = 'Preparando foto...';
+      btnSubir.disabled = true;
+      
+      // Subir a Supabase
+      textoProgreso.textContent = 'Subiendo foto a Supabase...';
+      progreso.style.width = '30%';
+      
+      const resultado = await agregarFoto(archivoSeleccionado, titulo, descripcion, frase);
+      
+      progreso.style.width = '100%';
+      textoProgreso.textContent = '¡Foto subida!';
+      
+      setTimeout(() => {
+        progresoSubida.style.display = 'none';
+        btnSubir.disabled = false;
+        mostrarMensaje('¡Foto subida correctamente! Ahora aparece en tu colage.', 'exito');
+      }, 500);
+      
+    } catch (error) {
+      progresoSubida.style.display = 'none';
+      btnSubir.disabled = false;
+      console.error('Error al subir:', error);
+      
+      let mensajeError = 'Error al subir la foto. Inténtalo de nuevo más tarde.';
+      
+      if (error.message.includes('403') || error.message.includes('forbidden')) {
+        mensajeError = 'No tienes permiso para subir fotos. Verifica tu configuración de Supabase.';
+      } else if (error.message.includes('404') || error.message.includes('not found')) {
+        mensajeError = 'No se encontró el bucket o tabla. Configura Supabase correctamente.';
+      } else if (error.message.includes('413') || error.message.includes('payload too large')) {
+        mensajeError = 'La foto es demasiado grande. Máximo 5MB.';
+      } else if (error.message.includes('network')) {
+        mensajeError = 'Error de conexión. Verifica tu conexión a internet.';
+      }
+      
+      mostrarMensaje(mensajeError, 'error');
+    }
+  });
+
+  // Cargar fotos recientes
+  async function cargarFotosRecientes() {
+    try {
+      gridRecientes.innerHTML = '<p class="cargando">Cargando fotos...</p>';
+      
+      const fotos = await obtenerFotos();
+      
+      if (fotos.length === 0) {
+        gridRecientes.innerHTML = '<p class="sin-resultados">Todavía no hay fotos subidas. ¡Sé el primero!</p>';
+        return;
+      }
+      
+      // Mostrar las 6 fotos más recientes
+      const fotosRecientes = fotos.slice(0, 6);
+      
+      gridRecientes.innerHTML = fotosRecientes.map(foto => `
+        <div class="tarjeta-reciente">
+          <div class="imagen-reciente">
+            <img src="${foto.url}" alt="${foto.alt || foto.titulo}" loading="lazy">
+          </div>
+          <div class="info-reciente">
+            <h3>${foto.titulo}</h3>
+            <p>${foto.descripcion.substring(0, 50)}${foto.descripcion.length > 50 ? '...' : ''}</p>
+            <span class="fecha-reciente">${new Date(foto.fecha_subida).toLocaleDateString('es-ES')}</span>
+          </div>
+        </div>
+      `).join('');
+      
+    } catch (error) {
+      console.error('Error al cargar fotos:', error);
+      gridRecientes.innerHTML = '<p class="error">Error al cargar fotos. Verifica tu conexión a internet y la configuración de Supabase.</p>';
+    }
+  }
+
+  // Cargar fotos al iniciar
+  cargarFotosRecientes();
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build
+vercel
+.netlify
+
+# Firebase
+firebase.json
+firebase-debug.log
+
+# Backups
+backup_original/
+*_backup/
+backup*/
+
+# Fotos de ejemplo (opcional, descomentar si no se quieren subir)
+# assets/fotos/*
+
+# Música local (opcional, descomentar si se usa CDN)
+# assets/musica/*

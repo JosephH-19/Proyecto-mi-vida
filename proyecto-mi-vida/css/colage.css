@@ -1,0 +1,70 @@
+.colage-header{
+  position: relative;
+  z-index: 2;
+  text-align:center;
+  padding: 1em 1em 1.6em;
+}
+.colage-doodles{ display:flex; justify-content:center; align-items:center; gap:.6em; }
+.colage-header h1{ font-size: 3rem; margin-top:.2em; }
+.colage-sub{ opacity:.8; }
+
+.grid-colage{
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.2em 3em;
+  columns: 4 280px;
+  column-gap: 1.4em;
+}
+@media (max-width: 900px){ .grid-colage{ columns: 2 220px; } }
+@media (max-width: 520px){ .grid-colage{ columns: 1; } }
+
+.tarjeta-foto{
+  break-inside: avoid;
+  background: var(--blanco);
+  border: 3px solid var(--rosa-suave);
+  border-radius: var(--radio);
+  padding: .7em .7em 1em;
+  margin-bottom: 1.4em;
+  box-shadow: 0 8px 20px rgba(0,0,0,.05);
+  position: relative;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.tarjeta-foto:hover{
+  transform: rotate(-1deg) translateY(-3px);
+  box-shadow: var(--sombra);
+}
+
+.marco-foto{
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--rosa-suave);
+  aspect-ratio: 4 / 3;
+}
+.marco-foto img{
+  width:100%; height:100%;
+  object-fit: cover;
+  display:block;
+}
+.marco-foto img.sin-foto{
+  object-fit: none;
+  background: linear-gradient(135deg, var(--rosa-suave), var(--lila));
+}
+.doodle-esquina{
+  position:absolute; bottom:6px; right:6px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.15));
+}
+
+.descripcion-foto{
+  font-size: .92rem;
+  margin: .8em .2em .2em;
+  color: var(--tinta);
+}
+.frase-foto{
+  font-size: 1.5rem;
+  margin: 0 .2em;
+  color: var(--rosa-profundo);
+  line-height: 1.15;
+}

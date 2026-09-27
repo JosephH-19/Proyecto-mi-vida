@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Para Ohanna 🤍</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="lluvia-petalos" class="lluvia-petalos" aria-hidden="true"></div>
+
+<main class="login-envoltorio">
+  <section class="login-tarjeta">
+    <div class="login-doodles" id="doodle-header"></div>
+
+    <h1>Para mi Ohanna</h1>
+    <p class="login-sub">Un rinconcito hecho solo para nosotros dos.</p>
+
+    <form id="form-login" autocomplete="off">
+      <label for="clave">Escribe tu nombre o nuestra clave</label>
+      <input type="text" id="clave" name="clave" placeholder="Ohanna, Joseph o la clave..." required>
+      <button type="submit">Entrar</button>
+      <p id="mensaje-error" class="mensaje-error" role="alert" aria-live="polite"></p>
+    </form>
+
+    <div class="reproductor">
+      <p class="nota-musica">La música se reproducirá automáticamente al entrar</p>
+    </div>
+  </section>
+</main>
+
+<footer class="firma">hecho con todo mi cariño para ti ✿</footer>
+
+<!-- Cargar música de fondo -->
+<script type="module" src="js/musica.js"></script>
+<script src="js/doodles.js"></script>
+<script src="js/petalos.js"></script>
+<script>
+  document.getElementById('doodle-header').innerHTML = svgPerrito(80) + svgPajarito(36);
+  iniciarLluviaDeFlores();
+
+  const CODIGOS_VALIDOS = ['josephohanna', 'joseph', 'ohanna'];
+  const form = document.getElementById('form-login');
+  const mensajeError = document.getElementById('mensaje-error');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const valor = document.getElementById('clave').value.trim().toLowerCase();
+
+    if (CODIGOS_VALIDOS.includes(valor)) {
+      mensajeError.textContent = '';
+      document.querySelector('.login-tarjeta').classList.add('desvanecer');
+      setTimeout(() => { window.location.href = 'colage.html'; }, 900);
+    } else {
+      mensajeError.textContent = 'Ese no es nuestro secreto... inténtalo de nuevo 💭';
+    }
+  });
+</script>
+</body>
+</html>

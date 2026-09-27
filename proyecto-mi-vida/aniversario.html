@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuestro Aniversario 💖</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/celebraciones.css">
+</head>
+<body>
+
+<div id="lluvia-petalos" class="lluvia-petalos" aria-hidden="true"></div>
+
+<nav class="nav-hojas">
+  <a href="colage.html">Nuestro colage</a>
+  <a href="carta.html">Una carta para ti</a>
+  <a href="cumpleanos.html">Cumpleaños</a>
+  <a href="aniversario.html" class="activa">Aniversario</a>
+</nav>
+
+<main class="celebracion-envoltorio">
+  <div class="celebracion-contenido" id="contenido-aniversario">
+    <div id="doodle-header" class="celebracion-doodles"></div>
+    
+    <div class="aniversario-bloque" id="aniversario-1ano" style="display: none;">
+      <div class="corazones-flotantes" id="corazones-flotantes"></div>
+      
+      <h1>1 Año de Amor 💘</h1>
+      <p class="celebracion-mensaje aangele">Mi Ohanna, hoy celebramos 365 días de amor, de risas, de sueños 
+      y de momentos que han cambiado mi vida para siempre. 
+      Cada día a tu lado ha sido una bendición, una aventura, un regalo.</p>
+      
+      <div class="reloj-amor">
+        <div class="numero-aniversario manuscrita">1</div>
+        <div class="texto-aniversario">Año de amor verdadero</div>
+        <div class="detalles-aniversario">
+          <p>Desde el <span class="fecha-destacada">1 de Octubre de 2025</span></p>
+          <p>Hasta hoy, y por siempre...</p>
+        </div>
+      </div>
+      
+      <div class="linea-tiempo">
+        <h2>Nuestra Historia en 12 Momentos</h2>
+        <div class="timeline" id="timeline-aniversario">
+          <!-- Se cargarán dinámicamente -->
+        </div>
+      </div>
+      
+      <div class="promesa">
+        <h2>Mi Promesa para el Próximo Año</h2>
+        <p class="promesa-texto manuscrita">Prometo amarte cada día más, 
+        cuidarte como el tesoro que eres, 
+        y hacer que cada momento a tu lado sea especial.</p>
+        <p class="firma-promesa">— Joseph, para siempre</p>
+      </div>
+    </div>
+    
+    <div class="aniversario-bloque" id="aniversario-proximo" style="display: none;">
+      <h1>Próximo Aniversario 📅</h1>
+      <p class="celebracion-mensaje">Estamos a punto de celebrar otro año juntos. 
+      Cada día que pasa, mi amor por ti crece más y más.</p>
+      
+      <div class="contador-aniversario">
+        <div class="contador-item">
+          <span class="numero" id="dias-aniversario">0</span>
+          <span class="label">Días</span>
+        </div>
+        <div class="contador-item">
+          <span class="numero" id="horas-aniversario">0</span>
+          <span class="label">Horas</span>
+        </div>
+        <div class="contador-item">
+          <span class="numero" id="minutos-aniversario">0</span>
+          <span class="label">Minutos</span>
+        </div>
+        <div class="contador-item">
+          <span class="numero" id="segundos-aniversario">0</span>
+          <span class="label">Segundos</span>
+        </div>
+      </div>
+      
+      <div class="aniversario-proximo-fecha">
+        <h2>1 de Octubre de 2026</h2>
+        <p>2 años de amor, complicidad y felicidad</p>
+      </div>
+    </div>
+    
+    <div class="aniversario-bloque" id="aniversario-otro" style="display: none;">
+      <h1>Nuestro Aniversario 💖</h1>
+      <p class="celebracion-mensaje">Hoy celebramos el amor que nos une. 
+      No importa cuánto tiempo pase, lo importante es que seguimos juntos, 
+      construyendo nuestra historia día a día.</p>
+      
+      <div class="arbol-amor">
+        <div class="tronco"></div>
+        <div class="hojas"></div>
+        <div class="anillos">
+          <div class="anillo" style="--n: 1;"></div>
+        </div>
+        <p class="texto-arbol manuscrita">Nuestro amor crece como un árbol fuerte</p>
+      </div>
+      
+      <div class="mensaje-especial">
+        <h2>¿Qué ha significado este año para mí?</h2>
+        <ul class="lista-amor">
+          <li>He aprendido que el amor verdadero existe</li>
+          <li>He descubierto que puedo ser mejor persona contigo</li>
+          <li>He encontrado mi lugar favorito: a tu lado</li>
+          <li>He entendido que la felicidad es sencilla cuando estás tú</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="firma">Eternamente tuyo, Ohanna ✿</footer>
+
+<script src="js/doodles.js"></script>
+<script src="js/petalos.js"></script>
+<script type="module" src="js/musica.js"></script>
+<script>
+  // Inicializar animaciones
+  document.getElementById('doodle-header').innerHTML = svgPerrito(60) + svgLirio(45) + svgPajarito(35) + svgLirio(45) + svgPerrito(60);
+  iniciarLluviaDeFlores('lluvia-petalos', 1600);
+  
+  // Fecha de aniversario: 1 de Octubre
+  const fechaAniversario = { dia: 1, mes: 9, ano: 2025 };
+  
+  function esAniversarioHoy() {
+    const hoy = new Date();
+    return hoy.getDate() === fechaAniversario.dia && hoy.getMonth() === fechaAniversario.mes;
+  }
+  
+  function calcularTiempoHastaAniversario() {
+    const hoy = new Date();
+    const esteAno = new Date(hoy.getFullYear(), fechaAniversario.mes, fechaAniversario.dia);
+    const proximoAno = new Date(hoy.getFullYear() + 1, fechaAniversario.mes, fechaAniversario.dia);
+    
+    const fechaProximo = esteAno > hoy ? esteAno : proximoAno;
+    const difMs = fechaProximo - hoy;
+    
+    const segundos = Math.floor(difMs / 1000);
+    const minutos = Math.floor(segundos / 60);
+    const horas = Math.floor(minutos / 60);
+    const dias = Math.floor(horas / 24);
+    
+    return {
+      dias: dias,
+      horas: horas % 24,
+      minutos: minutos % 60,
+      segundos: segundos % 60
+    };
+  }
+  
+  function actualizarContador() {
+    const tiempo = calcularTiempoHastaAniversario();
+    
+    const diasEl = document.getElementById('dias-aniversario');
+    const horasEl = document.getElementById('horas-aniversario');
+    const minutosEl = document.getElementById('minutos-aniversario');
+    const segundosEl = document.getElementById('segundos-aniversario');
+    
+    if (diasEl) diasEl.textContent = tiempo.dias;
+    if (horasEl) horasEl.textContent = tiempo.horas.toString().padStart(2, '0');
+    if (minutosEl) minutosEl.textContent = tiempo.minutos.toString().padStart(2, '0');
+    if (segundosEl) segundosEl.textContent = tiempo.segundos.toString().padStart(2, '0');
+  }
+  
+  function mostrarAniversario() {
+    const hoy = new Date();
+    const esHoy = esAniversarioHoy();
+    const esPrimerAnio = hoy.getFullYear() === fechaAniversario.ano + 1 && esHoy;
+    
+    if (esPrimerAnio) {
+      // 1 año exacto
+      document.getElementById('aniversario-1ano').style.display = 'block';
+      
+      // Crear animación de corazones
+      crearCorazonesFlotantes();
+      
+      // Cargar timeline
+      cargarTimeline();
+      
+    } else if (esHoy) {
+      // Otro aniversario
+      document.getElementById('aniversario-otro').style.display = 'block';
+      
+      // Actualizar el árbol con los años correspondientes
+      const anosJuntos = hoy.getFullYear() - fechaAniversario.ano;
+      const anillosContainer = document.querySelector('.anillos');
+      anillosContainer.innerHTML = '';
+      
+      for (let i = 1; i <= anosJuntos; i++) {
+        const anillo = document.createElement('div');
+        anillo.className = 'anillo';
+        anillo.style = `--n: ${i};`;
+        anillosContainer.appendChild(anillo);
+      }
+      
+      // Actualizar texto
+      const textoAnillo = document.querySelector('.texto-arbol');
+      if (textoAnillo) {
+        textoAnillo.textContent = `${anosJuntos} año${anosJuntos > 1 ? 's' : ''} de amor incondicional`;
+      }
+      
+    } else {
+      // Próximo aniversario
+      document.getElementById('aniversario-proximo').style.display = 'block';
+      actualizarContador();
+      setInterval(actualizarContador, 1000);
+    }
+  }
+  
+  function crearCorazonesFlotantes() {
+    const container = document.getElementById('corazones-flotantes');
+    const colores = ['#FF6B9D', '#E8A2B0', '#FF9F1C', '#A8E6CF', '#F6D374'];
+    
+    for (let i = 0; i < 20; i++) {
+      setTimeout(() => {
+        const corazon = document.createElement('div');
+        corazon.innerHTML = '❤️';
+        corazon.style.cssText = `
+          position: absolute;
+          font-size: ${20 + Math.random() * 30}px;
+          color: ${colores[Math.floor(Math.random() * colores.length)]};
+          left: ${Math.random() * 100}%;
+          top: -50px;
+          animation: flotarCorazon ${5 + Math.random() * 5}s linear infinite;
+          animation-delay: ${Math.random() * 2}s;
+        `;
+        container.appendChild(corazon);
+      }, i * 200);
+    }
+  }
+  
+  function cargarTimeline() {
+    const timeline = document.getElementById('timeline-aniversario');
+    
+    const eventos = [
+      { fecha: 'Oct 1, 2025', titulo: 'El Principio', descripcion: 'El día que todo cambió, cuando te dije que te amaba' },
+      { fecha: 'Oct 15, 2025', titulo: 'Primer Beso', descripcion: 'Nuestro primer beso bajo las estrellas' },
+      { fecha: 'Nov 20, 2025', titulo: 'Primera Cita', descripcion: 'Nuestra primera cita oficial, nervios y mariposas' },
+      { fecha: 'Dec 25, 2025', titulo: 'Navidad Juntos', descripcion: 'Nuestra primera Navidad como pareja' },
+      { fecha: 'Jan 11, 2026', titulo: 'Cumpleaños de Joseph', descripcion: 'Celebraste mi cumpleaños como nadie lo había hecho' },
+      { fecha: 'Mar 14, 2026', titulo: 'Primera Pelea', descripcion: 'Nuestra primera discusión... y nuestro primer "lo siento"' },
+      { fecha: 'Apr 10, 2026', titulo: 'Viaje Juntos', descripcion: 'Nuestro primer viaje como pareja' },
+      { fecha: 'May 5, 2026', titulo: 'Conociendo Familias', descripcion: 'El día que conocí a tu familia oficialmente' },
+      { fecha: 'Jun 20, 2026', titulo: '6 Meses', descripcion: 'Medio año de amor y complicidad' },
+      { fecha: 'Jul 15, 2026', titulo: 'Verano Juntos', descripcion: 'Días de playa, sol y mucho amor' },
+      { fecha: 'Sep 1, 2026', titulo: 'Proyectos Juntos', descripcion: 'Empezamos a planear nuestro futuro' },
+      { fecha: 'Oct 1, 2026', titulo: '1 Año', descripcion: '365 días de amor, y esto solo es el principio' }
+    ];
+    
+    timeline.innerHTML = eventos.map((evento, index) => `
+      <div class="evento-timeline">
+        <div class="circulo-timeline">${index + 1}</div>
+        <div class="contenido-timeline">
+          <h3>${evento.titulo}</h3>
+          <p class="fecha-timeline">${evento.fecha}</p>
+          <p>${evento.descripcion}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Mostrar aniversario al cargar
+  mostrarAniversario();
+  
+  // Animación de corazones con CSS (si no hay JS)
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes flotarCorazon {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+    }
+    @keyframes caerConfeti {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+</body>
+</html>

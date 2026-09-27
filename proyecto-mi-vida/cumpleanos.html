@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¡Feliz Cumpleaños! 🎂🤍</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/celebraciones.css">
+</head>
+<body>
+
+<div id="lluvia-petalos" class="lluvia-petalos" aria-hidden="true"></div>
+
+<nav class="nav-hojas">
+  <a href="colage.html">Nuestro colage</a>
+  <a href="carta.html">Una carta para ti</a>
+  <a href="cumpleanos.html" class="activa">Cumpleaños</a>
+  <a href="aniversario.html">Aniversario</a>
+</nav>
+
+<main class="celebracion-envoltorio">
+  <div class="celebracion-contenido" id="contenido-cumpleanos">
+    <div id="doodle-header" class="celebracion-doodles"></div>
+    
+    <div class="celebracion-bloque" id="cumple-joseph" style="display: none;">
+      <div class="globos">
+        <div class="globo" style="--color: #FF6B9D; --left: 10%;">🎈</div>
+        <div class="globo" style="--color: #4ECDC4; --left: 30%;">🎈</div>
+        <div class="globo" style="--color: #FFE66D; --left: 50%;">🎈</div>
+        <div class="globo" style="--color: #FF9F1C; --left: 70%;">🎈</div>
+        <div class="globo" style="--color: #A8E6CF; --left: 90%;">🎈</div>
+      </div>
+      
+      <h1>¡Feliz Cumpleaños, Joseph! 🎉</h1>
+      <p class="celebracion-mensaje">Hoy es tu día, el día en que el mundo ganó a alguien tan especial como tú. 
+      Gracias por ser quien eres, por tu amor, por tu paciencia y por hacerme 
+      la persona más feliz del mundo.</p>
+      
+      <div class="pasta-cumple">
+        <div class="vela" style="--altura: 60%;"></div>
+        <div class="vela" style="--altura: 80%;"></div>
+        <div class="vela" style="--altura: 70%;"></div>
+        <div class="vela" style="--altura: 90%;"></div>
+        <div class="vela" style="--altura: 65%;"></div>
+        <p class="texto-pastel manuscrita">Haz un deseo ✨</p>
+      </div>
+      
+      <div class="recuerdos-cumple">
+        <h2>Nuestros recuerdos este año:</h2>
+        <div class="recuerdos-grid" id="recuerdos-joseph"></div>
+      </div>
+    </div>
+    
+    <div class="celebracion-bloque" id="cumple-ohanna" style="display: none;">
+      <div class="confeti" id="confeti-ohanna"></div>
+      
+      <h1>¡Feliz Cumpleaños, Ohanna! 💖🎂</h1>
+      <p class="celebracion-mensaje">Mi amor, hoy el universo celebra el día en que llegaste a este mundo. 
+      Eres mi luz, mi inspiración, mi razón para sonreír cada día. 
+      Que este año esté lleno de tanta felicidad como la que me das a mí.</p>
+      
+      <div class="regalo">
+        <div class="caja-regalo">
+          <div class="tapa"></div>
+          <div class="cinta"></div>
+          <div class="lazo"></div>
+        </div>
+        <p class="texto-regalo manuscrita">Abre tu corazón 💝</p>
+      </div>
+      
+      <div class="recuerdos-cumple">
+        <h2>Nuestros recuerdos este año:</h2>
+        <div class="recuerdos-grid" id="recuerdos-ohanna"></div>
+      </div>
+    </div>
+    
+    <div class="celebracion-bloque" id="cumple-ogro" style="display: none;">
+      <h1>¡Feliz Cumpleaños! 🎉</h1>
+      <p class="celebracion-mensaje">Hoy no es el cumpleaños de ninguno de los dos, pero eso no significa 
+      que no podamos celebrar el amor que sentimos cada día. 
+      Cada momento a tu lado es un regalo.</p>
+      
+      <div class="calendario-cumple">
+        <div class="fecha-cumple">
+          <span class="dia">11</span>
+          <span class="mes">Enero</span>
+          <span class="nombre">Joseph</span>
+        </div>
+        <div class="flecha">❤️</div>
+        <div class="fecha-cumple">
+          <span class="dia">07</span>
+          <span class="mes">Octubre</span>
+          <span class="nombre">Ohanna</span>
+        </div>
+      </div>
+      
+      <p class="contador-dias" id="contador-cumple"></p>
+    </div>
+  </div>
+</main>
+
+<footer class="firma">Te amo más que a nada en este mundo ✿</footer>
+
+<script src="js/doodles.js"></script>
+<script src="js/petalos.js"></script>
+<script type="module" src="js/musica.js"></script>
+<script>
+  // Inicializar animaciones
+  document.getElementById('doodle-header').innerHTML = svgPajarito(40) + svgLirio(50) + svgPerrito(70) + svgLirio(50) + svgPajarito(40);
+  iniciarLluviaDeFlores('lluvia-petalos', 1500);
+  
+  // Datos de cumpleaños
+  const cumpleJoseph = { dia: 11, mes: 0 }; // Enero = 0
+  const cumpleOhanna = { dia: 7, mes: 9 }; // Octubre = 9
+  
+  function esCumpleHoy(dia, mes) {
+    const hoy = new Date();
+    return hoy.getDate() === dia && hoy.getMonth() === mes;
+  }
+  
+  function calcularDiasHasta(dia, mes) {
+    const hoy = new Date();
+    const esteAno = new Date(hoy.getFullYear(), mes, dia);
+    const proximoAno = new Date(hoy.getFullYear() + 1, mes, dia);
+    
+    const fechaProximo = esteAno > hoy ? esteAno : proximoAno;
+    const difMs = fechaProximo - hoy;
+    const difDias = Math.ceil(difMs / (1000 * 60 * 60 * 24));
+    
+    return difDias;
+  }
+  
+  // Mostrar el bloque correspondiente
+  function mostrarCumple() {
+    const hoy = new Date();
+    const esJoseph = esCumpleHoy(cumpleJoseph.dia, cumpleJoseph.mes);
+    const esOhanna = esCumpleHoy(cumpleOhanna.dia, cumpleOhanna.mes);
+    
+    if (esJoseph) {
+      document.getElementById('cumple-joseph').style.display = 'block';
+      // Cargar recuerdos de Joseph
+      cargarRecuerdos('joseph', 'recuerdos-joseph');
+    } else if (esOhanna) {
+      document.getElementById('cumple-ohanna').style.display = 'block';
+      // Animación de confeti
+      crearConfeti();
+      // Cargar recuerdos de Ohanna
+      cargarRecuerdos('ohanna', 'recuerdos-ohanna');
+    } else {
+      document.getElementById('cumple-ogro').style.display = 'block';
+      
+      // Mostrar contador de días
+      const diasJoseph = calcularDiasHasta(cumpleJoseph.dia, cumpleJoseph.mes);
+      const diasOhanna = calcularDiasHasta(cumpleOhanna.dia, cumpleOhanna.mes);
+      
+      const contador = document.getElementById('contador-cumple');
+      if (diasJoseph === diasOhanna) {
+        contador.textContent = `Faltan ${diasJoseph} días para celebrar vuestros cumpleaños juntos`;
+      } else if (diasJoseph < diasOhanna) {
+        contador.textContent = `Faltan ${diasJoseph} días para el cumpleaños de Joseph y ${diasOhanna} días para el de Ohanna`;
+      } else {
+        contador.textContent = `Faltan ${diasOhanna} días para el cumpleaños de Ohanna y ${diasJoseph} días para el de Joseph`;
+      }
+    }
+  }
+  
+  // Crear animación de confeti
+  function crearConfeti() {
+    const confetiContainer = document.getElementById('confeti-ohanna');
+    const colores = ['#FF6B9D', '#4ECDC4', '#FFE66D', '#FF9F1C', '#A8E6CF', '#FFD93D', '#6BCB77'];
+    
+    for (let i = 0; i < 100; i++) {
+      setTimeout(() => {
+        const confeti = document.createElement('div');
+        confeti.style.cssText = `
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          background: ${colores[Math.floor(Math.random() * colores.length)]};
+          left: ${Math.random() * 100}%;
+          top: -10px;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+          animation: caerConfeti ${3 + Math.random() * 2}s linear forwards;
+        `;
+        confetiContainer.appendChild(confeti);
+      }, i * 30);
+    }
+  }
+  
+  // Cargar recuerdos del año (simulación con fotos recientes)
+  async function cargarRecuerdos(nombre, contenedorId) {
+    const contenedor = document.getElementById(contenedorId);
+    const hoy = new Date();
+    const anoActual = hoy.getFullYear();
+    
+    // Simular recuerdos (en una versión real, esto vendría de Firebase)
+    const recuerdos = [
+      { fecha: new Date(anoActual, 0, 1), texto: `Empezamos el año juntos` },
+      { fecha: new Date(anoActual, 2, 15), texto: `Nuestra primera escapada` },
+      { fecha: new Date(anoActual, 5, 10), texto: `El día que supimos que éramos el uno para el otro` },
+      { fecha: new Date(anoActual, 7, 20), texto: `Vacaciones de verano inolvidables` },
+      { fecha: new Date(anoActual, 9, 1), texto: `Primer aniversario como enamorados` }
+    ].filter(r => {
+      const cumple = nombre === 'joseph' ? cumpleJoseph : cumpleOhanna;
+      return r.fecha > new Date(anoActual, cumple.mes, cumple.dia);
+    });
+    
+    contenedor.innerHTML = recuerdos.map(recuerdo => `
+      <div class="recuerdo">
+        <span class="fecha-recuerdo">${recuerdo.fecha.toLocaleDateString('es-ES', { month: 'long', day: 'numeric' })}</span>
+        <p>${recuerdo.texto}</p>
+      </div>
+    `).join('');
+  }
+  
+  // Mostrar cumpleaños al cargar
+  mostrarCumple();
+</script>
+</body>
+</html>

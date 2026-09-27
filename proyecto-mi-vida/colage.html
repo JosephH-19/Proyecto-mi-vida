@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuestro colage 🤍</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/colage.css">
+</head>
+<body>
+
+<div id="lluvia-petalos" class="lluvia-petalos" aria-hidden="true"></div>
+
+<nav class="nav-hojas">
+  <a href="colage.html" class="activa">Nuestro colage</a>
+  <a href="carta.html">Una carta para ti</a>
+  <a href="cumpleanos.html">Cumpleaños</a>
+  <a href="aniversario.html">Aniversario</a>
+  <a href="subir-foto.html">Añadir Foto</a>
+</nav>
+
+<header class="colage-header">
+  <div id="doodle-header" class="colage-doodles"></div>
+  <h1>Joseph &amp; Ohanna</h1>
+  <p class="colage-sub">Cada foto es un pedacito de lo mucho que te amo.</p>
+</header>
+
+<main id="grid-colage" class="grid-colage">
+  <div class="cargando-colage">
+    <div class="spinner"></div>
+    <p>Cargando tus fotos...</p>
+  </div>
+</main>
+
+<footer class="firma">te amo y más ✿</footer>
+
+<script src="js/doodles.js"></script>
+<script src="js/petalos.js"></script>
+<script type="module" src="js/musica.js"></script>
+<script type="module">
+  import { obtenerFotosParaColage } from './js/supabase-config.js';
+
+  document.getElementById('doodle-header').innerHTML = svgLirio(50) + svgPerrito(70) + svgLirio(50);
+  iniciarLluviaDeFlores('lluvia-petalos', 1400);
+
+  function crearTarjetaFoto(foto) {
+    const tarjeta = document.createElement('article');
+    tarjeta.className = 'tarjeta-foto';
+
+    tarjeta.innerHTML = `
+      <div class="marco-foto">
+        <img src="${foto.src || foto.url}" alt="${foto.alt}" loading="lazy"
+             onerror="this.classList.add('sin-foto'); this.alt='${foto.alt} (foto no disponible)';">
+        <span class="doodle-esquina">${svgPajarito(26)}</span>
+      </div>
+      <p class="descripcion-foto">${foto.descripcion}</p>
+      <p class="frase-foto manuscrita">${foto.frase || foto.titulo}</p>
+      ${foto.fecha ? `<p class="fecha-foto">${new Date(foto.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>` : ''}
+    `;
+    return tarjeta;
+  }
+
+  async function renderizarColage() {
+    const contenedor = document.getElementById('grid-colage');
+    
+    try {
+      // Intentar con Supabase
+      const fotos = await obtenerFotosParaColage();
+      
+      if (fotos.length > 0) {
+        contenedor.innerHTML = '';
+        fotos.forEach((foto) => {
+          contenedor.appendChild(crearTarjetaFoto(foto));
+        });
+        return;
+      }
+      
+      // Si no hay fotos en Supabase, usar datos locales de respaldo
+      console.log('Supabase no devolvió fotos, usando datos locales...');
+      usarDatosLocales();
+      
+    } catch (error) {
+      console.error('Error al cargar fotos de Supabase:', error);
+      console.log('Usando datos locales de respaldo...');
+      usarDatosLocales();
+    }
+  }
+
+  function usarDatosLocales() {
+    const contenedor = document.getElementById('grid-colage');
+    
+    // Datos de respaldo (el archivo original fotos-data.js)
+    const FOTOS_LOCAL = [
+      {
+        src: "assets/fotos/foto1.jpeg",
+        alt: "Foto 1 de Joseph y Ohanna",
+        descripcion: "Nuestra primera foto juntos en el campo, el día que supe que eras más que especial para mi corazón",
+        frase: "Desde ese momento, supe que mi corazón tenía dueña"
+      },
+      {
+        src: "assets/fotos/foto2.jpg",
+        alt: "Foto 2 de Joseph y Ohanna",
+        descripcion: "Una mia mientras trabajo y estudio y te tengo presente siempre",
+        frase: "Contigo, hasta en mi mente"
+      },
+      {
+        src: "assets/fotos/foto3.jpg",
+        alt: "Foto 3 de Joseph y Ohanna",
+        descripcion: "Nuestra primer concierto, donde las miradas decían más que las palabras",
+        frase: "Tus ojos son el mapa que guía mi alma"
+      },
+      {
+        src: "assets/fotos/foto4.jpg",
+        alt: "Foto 4 de Joseph y Ohanna",
+        descripcion: "Risas sin fin por esa foto esperda aunque no salimos tan bien",
+        frase: "Reír contigo es mi medicina favorita"
+      },
+      {
+        src: "assets/fotos/foto5.jpg",
+        alt: "Foto 5 de Joseph y Ohanna",
+        descripcion: "una casual tuya, que me gusta revisar y ver porque me recuerda tu esencia",
+        frase: "Las cosas más simples de tu ser me enamoran más"
+      },
+      {
+        src: "assets/fotos/foto6.jpg",
+        alt: "Foto 6 de Joseph y Ohanna",
+        descripcion: "Besito en la frente",
+        frase: "No olvides que siempre tendrás uno"
+      }
+    ];
+    
+    contenedor.innerHTML = '';
+    FOTOS_LOCAL.forEach((foto) => {
+      contenedor.appendChild(crearTarjetaFoto(foto));
+    });
+    
+    // Mostrar mensaje de que se están usando datos locales
+    const mensaje = document.createElement('div');
+    mensaje.className = 'mensaje-info';
+    mensaje.innerHTML = `<p>💡 <strong>Nota:</strong> Para ver las fotos subidas a Supabase, configura tu proyecto en <code>js/supabase-config.js</code></p>`;
+    mensaje.style.cssText = `
+      background: var(--crema);
+      border: 2px solid var(--rosa-suave);
+      border-radius: 12px;
+      padding: 1em;
+      margin: 1em auto;
+      max-width: 600px;
+      text-align: center;
+    `;
+    contenedor.appendChild(mensaje);
+  }
+
+  // Cargar fotos al iniciar
+  renderizarColage();
+</script>
+</body>
+</html>

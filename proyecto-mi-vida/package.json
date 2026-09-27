@@ -1,0 +1,20 @@
+{
+  "name": "proyecto-mi-vida",
+  "version": "2.0.0",
+  "description": "Página web romántica para Joseph y Ohanna con Supabase",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "start": "vercel dev"
+  },
+  "keywords": ["romantic", "photos", "love", "supabase"],
+  "author": "Joseph",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}

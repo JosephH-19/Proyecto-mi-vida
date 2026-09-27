@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Una carta para ti 🤍</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/carta.css">
+</head>
+<body>
+
+<div id="lluvia-petalos" class="lluvia-petalos" aria-hidden="true"></div>
+
+<nav class="nav-hojas">
+  <a href="colage.html">Nuestro colage</a>
+  <a href="carta.html" class="activa">Una carta para ti</a>
+  <a href="cumpleanos.html">Cumpleaños</a>
+  <a href="aniversario.html">Aniversario</a>
+  <a href="subir-foto.html">Añadir Foto</a>
+</nav>
+
+<main class="carta-envoltorio">
+  <article class="carta-papel">
+    <div id="doodle-header" class="carta-doodles"></div>
+    <h1>Para ti, Ohanna</h1>
+    <p>Mi amor, cada día a tu lado es un regalo que no merezco pero que agradezco con todo mi corazón. 
+    Eres la persona que ilumina mis días, que da color a mi mundo, que hace que todo tenga sentido.</p>
+    <p>Desde el día que entraste en mi vida, supe que nunca más sería el mismo. 
+    Has transformado mi forma de ver el mundo, de sentir, de amar. 
+    Contigo, hasta los días más oscuros se llenan de luz.</p>
+    <p>Prometo amarte cada día más, cuidarte como el tesoro que eres, 
+    y hacer que cada momento a tu lado sea tan especial como tú lo mereces.</p>
+    <p>Eres mi persona favorita, mi complemento, mi mitad. 
+    Juntos somos más fuertes, más felices, más completos.</p>
+    <p class="firma-carta manuscrita">Con todo mi amor, Joseph</p>
+  </article>
+</main>
+
+<footer class="firma">esta carta es para siempre ✿</footer>
+
+<script src="js/doodles.js"></script>
+<script src="js/petalos.js"></script>
+<script type="module" src="js/musica.js"></script>
+<script>
+  document.getElementById('doodle-header').innerHTML = svgLirio(46) + svgPajarito(30) + svgLirio(46);
+  iniciarLluviaDeFlores('lluvia-petalos', 1400);
+</script>
+</body>
+</html>

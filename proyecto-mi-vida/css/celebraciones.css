@@ -1,0 +1,756 @@
+/* ========================================
+   Estilos para Cumpleaños y Aniversarios
+   ======================================== */
+
+/* ---------- Envoltorio general ---------- */
+.celebracion-envoltorio {
+  position: relative;
+  z-index: 2;
+  min-height: calc(100vh - 120px);
+  padding: 1em 1.2em 3em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.celebracion-contenido {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.celebracion-doodles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .6em;
+  margin-bottom: 1.2em;
+}
+
+.celebracion-bloque,
+.aniversario-bloque {
+  text-align: center;
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Cumpleaños ---------- */
+
+/* Globos */
+.globos {
+  position: relative;
+  height: 120px;
+  margin-bottom: 1.5em;
+  overflow: hidden;
+}
+
+.globo {
+  position: absolute;
+  top: 80px;
+  width: 40px;
+  height: 50px;
+  background: var(--color);
+  border-radius: 20px;
+  animation: flotarGlobo 4s ease-in-out infinite;
+}
+
+.globo::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 20px;
+  background: var(--color);
+  border-radius: 0 0 4px 4px;
+}
+
+.globo::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 15px solid var(--color);
+}
+
+@keyframes flotarGlobo {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+/* Pastel de cumpleaños */
+.pasta-cumple {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  margin: 2em auto;
+  background: linear-gradient(to bottom, #FFE6CC 0%, #FFD3A5 50%, #D2B48C 100%);
+  border-radius: 10px 10px 50px 50px;
+  box-shadow: 0 10px 30px rgba(255, 213, 165, 0.5);
+  overflow: hidden;
+}
+
+.vela {
+  position: absolute;
+  bottom: calc(100% - var(--altura));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: var(--altura);
+  background: linear-gradient(to top, #FFFFFF 0%, #FF6B9D 100%);
+  border-radius: 4px;
+}
+
+.vela::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 8px solid #FFD93D;
+}
+
+.vela::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: #FFD93D;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #FFD93D, 0 0 20px #FFD93D, 0 0 30px #FFD93D;
+  animation: parpadeo 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes parpadeo {
+  from {
+    opacity: 1;
+    box-shadow: 0 0 10px #FFD93D, 0 0 20px #FFD93D, 0 0 30px #FFD93D;
+  }
+  to {
+    opacity: 0.7;
+    box-shadow: 0 0 5px #FFD93D, 0 0 10px #FFD93D, 0 0 15px #FFD93D;
+  }
+}
+
+.texto-pastel {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  color: #8B4513;
+}
+
+/* Regalo */
+.regalo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2em auto;
+}
+
+.caja-regalo {
+  position: relative;
+  width: 150px;
+  height: 100px;
+  background: #FFD374;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(255, 211, 116, 0.5);
+  animation: shakeGift 2s ease-in-out infinite;
+}
+
+.tapa {
+  position: absolute;
+  top: -20px;
+  left: -10px;
+  width: 170px;
+  height: 40px;
+  background: #FF9F1C;
+  border-radius: 5px 5px 0 0;
+  z-index: -1;
+  clip-path: polygon(0 0, 100% 0, 100% 60%, 50% 80%, 0 60%);
+}
+
+.cinta {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 20px;
+  background: #FF6B9D;
+  border-radius: 10px;
+}
+
+.lazo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background: #E8A2B0;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.lazo::before,
+.lazo::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: #E8A2B0;
+  border-radius: 50%;
+}
+
+.lazo::before {
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.lazo::after {
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@keyframes shakeGift {
+  0%, 100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+.texto-regalo {
+  margin-top: 1.5em;
+  font-size: 1.4rem;
+  color: #FF9F1C;
+}
+
+/* Calendario de cumpleaños */
+.calendario-cumple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
+  margin: 2em auto;
+  flex-wrap: wrap;
+}
+
+.fecha-cumple {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5em 2em;
+  background: var(--blanco);
+  border: 3px solid var(--rosa-suave);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.fecha-cumple .dia {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--rosa-profundo);
+  line-height: 1;
+}
+
+.fecha-cumple .mes {
+  font-size: 1.2rem;
+  color: var(--tinta);
+  font-weight: 600;
+  margin: 0.2em 0;
+}
+
+.fecha-cumple .nombre {
+  font-size: 1rem;
+  color: var(--tinta);
+  opacity: 0.8;
+}
+
+.flecha {
+  font-size: 2rem;
+  animation: latido 1.5s ease-in-out infinite;
+}
+
+@keyframes latido {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.contador-dias {
+  margin-top: 2em;
+  font-size: 1.1rem;
+  color: var(--tinta);
+  font-style: italic;
+}
+
+/* Recuerdos de cumpleaños */
+.recuerdos-cumple {
+  margin-top: 3em;
+  text-align: left;
+}
+
+.recuerdos-cumple h2 {
+  text-align: center;
+  margin-bottom: 1.5em;
+}
+
+.recuerdos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.2em;
+}
+
+.recuerdo {
+  background: var(--blanco);
+  border: 2px solid var(--rosa-suave);
+  border-radius: 16px;
+  padding: 1em 1.2em;
+  box-shadow: 0 4px 15px rgba(232, 162, 176, 0.15);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.recuerdo:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra);
+}
+
+.recuerdo .fecha-recuerdo {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--rosa-profundo);
+  font-weight: 600;
+  margin-bottom: 0.4em;
+}
+
+.recuerdo p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--tinta);
+  line-height: 1.5;
+}
+
+/* Confeti */
+.confeti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
+}
+
+/* ---------- Aniversario ---------- */
+
+/* Reloj de amor */
+.reloj-amor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2em auto;
+  position: relative;
+}
+
+.numero-aniversario {
+  font-size: 8rem;
+  font-weight: 700;
+  color: var(--rosa-profundo);
+  line-height: 1;
+  text-shadow: 2px 2px 4px rgba(232, 162, 176, 0.3);
+}
+
+.texto-aniversario {
+  font-size: 2rem;
+  color: var(--tinta);
+  margin-top: 0.5em;
+}
+
+.detalles-aniversario {
+  margin-top: 2em;
+  padding: 1.5em 2em;
+  background: var(--blanco);
+  border: 2px solid var(--rosa-suave);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.detalles-aniversario p {
+  margin: 0.5em 0;
+  font-size: 1.1rem;
+  color: var(--tinta);
+}
+
+.fecha-destacada {
+  font-weight: 700;
+  color: var(--rosa-profundo);
+  font-family: 'Caveat', cursive;
+  font-size: 1.2rem;
+}
+
+/* Línea de tiempo */
+.linea-tiempo {
+  margin-top: 3em;
+  text-align: center;
+}
+
+.linea-tiempo h2 {
+  margin-bottom: 2em;
+}
+
+.timeline {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 30px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--rosa-suave);
+}
+
+.evento-timeline {
+  position: relative;
+  display: flex;
+  margin-bottom: 2em;
+  padding-left: 80px;
+}
+
+.evento-timeline:nth-child(odd) {
+  padding-left: 80px;
+}
+
+.evento-timeline:nth-child(even) {
+  padding-left: 80px;
+}
+
+.circulo-timeline {
+  position: absolute;
+  left: 0;
+  width: 60px;
+  height: 60px;
+  background: var(--rosa-profundo);
+  color: var(--blanco);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 15px rgba(232, 162, 176, 0.4);
+  z-index: 1;
+}
+
+.contenido-timeline {
+  background: var(--blanco);
+  border: 2px solid var(--rosa-suave);
+  border-radius: var(--radio);
+  padding: 1em 1.2em;
+  box-shadow: 0 4px 15px rgba(232, 162, 176, 0.1);
+}
+
+.contenido-timeline h3 {
+  margin: 0 0 0.4em;
+  font-size: 1.2rem;
+}
+
+.contenido-timeline p {
+  margin: 0.2em 0;
+  font-size: 0.95rem;
+  color: var(--tinta);
+}
+
+.fecha-timeline {
+  font-size: 0.85rem !important;
+  color: var(--rosa-profundo) !important;
+  font-weight: 600 !important;
+  font-family: 'Quicksand', sans-serif !important;
+}
+
+/* Contador de aniversario */
+.contador-aniversario {
+  display: flex;
+  justify-content: center;
+  gap: 1.5em;
+  margin: 2em auto;
+  flex-wrap: wrap;
+}
+
+.contador-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1em 1.5em;
+  background: var(--blanco);
+  border: 2px solid var(--rosa-suave);
+  border-radius: 16px;
+  min-width: 100px;
+  box-shadow: var(--sombra);
+}
+
+.contador-item .numero {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--rosa-profundo);
+  font-family: 'Quicksand', sans-serif;
+}
+
+.contador-item .label {
+  font-size: 0.9rem;
+  color: var(--tinta);
+  opacity: 0.8;
+  margin-top: 0.3em;
+}
+
+.aniversario-proximo-fecha {
+  margin-top: 2em;
+  text-align: center;
+}
+
+.aniversario-proximo-fecha h2 {
+  font-size: 1.8rem;
+  color: var(--rosa-profundo);
+}
+
+.aniversario-proximo-fecha p {
+  font-size: 1.1rem;
+  color: var(--tinta);
+  opacity: 0.9;
+}
+
+/* Árbol de amor */
+.arbol-amor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2em auto;
+  height: 300px;
+}
+
+.tronco {
+  position: absolute;
+  bottom: 0;
+  width: 40px;
+  height: 150px;
+  background: linear-gradient(to bottom, #8B4513 0%, #654321 100%);
+  border-radius: 10px;
+  z-index: 1;
+}
+
+.hojas {
+  position: absolute;
+  bottom: 150px;
+  width: 200px;
+  height: 150px;
+  background: radial-gradient(circle at center, var(--sol) 0%, var(--salvia) 50%, var(--lila) 100%);
+  border-radius: 50%;
+  clip-path: polygon(50% 0%, 100% 20%, 80% 40%, 100% 60%, 50% 80%, 0% 60%, 20% 40%, 0% 20%);
+  animation: moverHojas 8s ease-in-out infinite;
+}
+
+@keyframes moverHojas {
+  0%, 100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+.anillos {
+  position: absolute;
+  bottom: 140px;
+  width: 250px;
+  height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.anillo {
+  width: 20px;
+  height: 20px;
+  background: var(--rosa-profundo);
+  border-radius: 50%;
+  border: 3px solid var(--blanco);
+  box-shadow: 0 0 10px rgba(232, 162, 176, 0.5);
+  transform: scale(var(--n));
+  animation: brilloAnillo 2s ease-in-out infinite;
+}
+
+@keyframes brilloAnillo {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(232, 162, 176, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(232, 162, 176, 0.9);
+  }
+}
+
+.texto-arbol {
+  position: absolute;
+  bottom: -40px;
+  font-size: 1.3rem;
+  color: var(--tinta);
+}
+
+/* Promesa */
+.promesa {
+  margin-top: 3em;
+  padding: 2em;
+  background: var(--crema);
+  border-radius: var(--radio);
+  border: 2px dashed var(--rosa-suave);
+}
+
+.promesa h2 {
+  text-align: center;
+  margin-bottom: 1.5em;
+  font-size: 1.8rem;
+}
+
+.promesa-texto {
+  font-size: 1.5rem;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--rosa-profundo);
+}
+
+.firma-promesa {
+  margin-top: 2em;
+  text-align: right;
+  font-size: 1.3rem;
+  color: var(--tinta);
+  font-style: italic;
+}
+
+/* Mensaje especial */
+.mensaje-especial {
+  margin-top: 3em;
+  text-align: left;
+}
+
+.mensaje-especial h2 {
+  text-align: center;
+  margin-bottom: 1.5em;
+}
+
+.lista-amor {
+  max-width: 500px;
+  margin: 0 auto;
+  padding-left: 1.5em;
+}
+
+.lista-amor li {
+  margin-bottom: 1em;
+  padding-left: 0.5em;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--tinta);
+  position: relative;
+}
+
+.lista-amor li::before {
+  content: '💖';
+  position: absolute;
+  left: -1.5em;
+  font-size: 1.2rem;
+}
+
+/* Corazones flotantes */
+.corazones-flotantes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .numero-aniversario {
+    font-size: 5rem;
+  }
+  
+  .contador-aniversario {
+    gap: 1em;
+  }
+  
+  .contador-item {
+    padding: 0.8em 1em;
+    min-width: 80px;
+  }
+  
+  .contador-item .numero {
+    font-size: 1.8rem;
+  }
+  
+  .timeline::before {
+    left: 20px;
+  }
+  
+  .evento-timeline {
+    padding-left: 60px;
+  }
+  
+  .circulo-timeline {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .numero-aniversario {
+    font-size: 4rem;
+  }
+  
+  .contador-item .numero {
+    font-size: 1.5rem;
+  }
+  
+  .recuerdos-grid {
+    grid-template-columns: 1fr;
+  }
+}
