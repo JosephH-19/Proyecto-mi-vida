@@ -238,6 +238,7 @@
     const titulo = document.getElementById('titulo').value.trim();
     const descripcion = document.getElementById('descripcion').value.trim();
     const frase = document.getElementById('frase').value.trim();
+    const fecha = document.getElementById('fecha').value;
     
     try {
       // Mostrar progreso
@@ -250,7 +251,7 @@
       textoProgreso.textContent = 'Subiendo foto a Supabase...';
       progreso.style.width = '30%';
       
-      const resultado = await agregarFoto(archivoSeleccionado, titulo, descripcion, frase);
+      const resultado = await agregarFoto(archivoSeleccionado, titulo, descripcion, frase, fecha);
       
       progreso.style.width = '100%';
       textoProgreso.textContent = '¡Foto subida!';
@@ -268,13 +269,14 @@
       
       let mensajeError = 'Error al subir la foto. Inténtalo de nuevo más tarde.';
       
-      if (error.message.includes('403') || error.message.includes('forbidden')) {
+      const detalleError = String(error?.message || error || '').toLowerCase();
+      if (detalleError.includes('403') || detalleError.includes('forbidden')) {
         mensajeError = 'No tienes permiso para subir fotos. Verifica tu configuración de Supabase.';
-      } else if (error.message.includes('404') || error.message.includes('not found')) {
+      } else if (detalleError.includes('404') || detalleError.includes('not found')) {
         mensajeError = 'No se encontró el bucket o tabla. Configura Supabase correctamente.';
-      } else if (error.message.includes('413') || error.message.includes('payload too large')) {
+      } else if (detalleError.includes('413') || detalleError.includes('payload too large')) {
         mensajeError = 'La foto es demasiado grande. Máximo 5MB.';
-      } else if (error.message.includes('network')) {
+      } else if (detalleError.includes('network')) {
         mensajeError = 'Error de conexión. Verifica tu conexión a internet.';
       }
       
@@ -294,22 +296,34 @@
         return;
       }
       
-      // Mostrar las 6 fotos más recientes
-      const fotosRecientes = fotos.slice(0, 6);
-      
-      gridRecientes.innerHTML = fotosRecientes.map(foto => `
-        <div class="tarjeta-reciente">
-          <div class="imagen-reciente">
-            <img src="${foto.url}" alt="${foto.alt || foto.titulo}" loading="lazy">
-          </div>
-          <div class="info-reciente">
-            <h3>${foto.titulo}</h3>
-            <p>${foto.descripcion.substring(0, 50)}${foto.descripcion.length > 50 ? '...' : ''}</p>
-            <span class="fecha-reciente">${new Date(foto.fecha_subida).toLocaleDateString('es-ES')}</span>
-          </div>
-        </div>
-      `).join('');
-      
+      // Mostrar las 6 fotos más recientes sin interpretar como HTML los datos de Supabase.
+      gridRecientes.replaceChildren();
+      fotos.slice(0, 6).forEach((foto) => {
+        const tarjeta = document.createElement('div');
+        tarjeta.className = 'tarjeta-reciente';
+        const imagenContenedor = document.createElement('div');
+        imagenContenedor.className = 'imagen-reciente';
+        const imagen = document.createElement('img');
+        imagen.src = foto.url || '';
+        imagen.alt = foto.alt || foto.titulo || 'Foto reciente';
+        imagen.loading = 'lazy';
+        imagenContenedor.append(imagen);
+
+        const info = document.createElement('div');
+        info.className = 'info-reciente';
+        const titulo = document.createElement('h3');
+        titulo.textContent = foto.titulo || '';
+        const descripcion = document.createElement('p');
+        const textoDescripcion = foto.descripcion || '';
+        descripcion.textContent = textoDescripcion.slice(0, 50) + (textoDescripcion.length > 50 ? '...' : '');
+        const fecha = document.createElement('span');
+        fecha.className = 'fecha-reciente';
+        fecha.textContent = foto.fecha_subida ? new Date(foto.fecha_subida).toLocaleDateString('es-ES') : '';
+        info.append(titulo, descripcion, fecha);
+        tarjeta.append(imagenContenedor, info);
+        gridRecientes.append(tarjeta);
+      });
+
     } catch (error) {
       console.error('Error al cargar fotos:', error);
       gridRecientes.innerHTML = '<p class="error">Error al cargar fotos. Verifica tu conexión a internet y la configuración de Supabase.</p>';

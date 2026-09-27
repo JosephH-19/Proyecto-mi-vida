@@ -141,7 +141,9 @@ Estas páginas muestran contenido especial automáticamente en sus fechas corres
    - Fecha (opcional)
 3. Haz clic en "Subir Foto"
 
-**Nota**: Las fotos se suben a Supabase Storage y se guarda la información en la base de datos.
+**Nota**: las fotos se suben a Supabase Storage y sus datos se guardan en la tabla `fotos`.
+
+**Seguridad**: el acceso de la portada es solo visual. Revisa `EJEMPLO-SUPABASE.md` antes de permitir subidas públicas; las políticas abiertas permiten que cualquier visitante use la API.
 
 ### Método 2: Manual (sin Supabase)
 Edita `js/fotos-data.js` y añade tus fotos:

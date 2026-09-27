@@ -47,16 +47,35 @@
     const tarjeta = document.createElement('article');
     tarjeta.className = 'tarjeta-foto';
 
-    tarjeta.innerHTML = `
-      <div class="marco-foto">
-        <img src="${foto.src || foto.url}" alt="${foto.alt}" loading="lazy"
-             onerror="this.classList.add('sin-foto'); this.alt='${foto.alt} (foto no disponible)';">
-        <span class="doodle-esquina">${svgPajarito(26)}</span>
-      </div>
-      <p class="descripcion-foto">${foto.descripcion}</p>
-      <p class="frase-foto manuscrita">${foto.frase || foto.titulo}</p>
-      ${foto.fecha ? `<p class="fecha-foto">${new Date(foto.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>` : ''}
-    `;
+    const marco = document.createElement('div');
+    marco.className = 'marco-foto';
+    const imagen = document.createElement('img');
+    imagen.src = foto.src || foto.url || '';
+    imagen.alt = foto.alt || foto.titulo || 'Foto del colage';
+    imagen.loading = 'lazy';
+    imagen.addEventListener('error', () => {
+      imagen.classList.add('sin-foto');
+      imagen.alt = `${foto.alt || foto.titulo || 'Foto'} (foto no disponible)`;
+    }, { once: true });
+    const esquina = document.createElement('span');
+    esquina.className = 'doodle-esquina';
+    esquina.innerHTML = svgPajarito(26);
+    marco.append(imagen, esquina);
+
+    const descripcion = document.createElement('p');
+    descripcion.className = 'descripcion-foto';
+    descripcion.textContent = foto.descripcion || '';
+    const frase = document.createElement('p');
+    frase.className = 'frase-foto manuscrita';
+    frase.textContent = foto.frase || foto.titulo || '';
+    tarjeta.append(marco, descripcion, frase);
+
+    if (foto.fecha) {
+      const fecha = document.createElement('p');
+      fecha.className = 'fecha-foto';
+      fecha.textContent = new Date(foto.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+      tarjeta.append(fecha);
+    }
     return tarjeta;
   }
 
@@ -80,13 +99,12 @@
       usarDatosLocales();
       
     } catch (error) {
-      console.error('Error al cargar fotos de Supabase:', error);
-      console.log('Usando datos locales de respaldo...');
-      usarDatosLocales();
+      console.error('No se pudieron cargar las fotos de Supabase:', error);
+      usarDatosLocales(error);
     }
   }
 
-  function usarDatosLocales() {
+  function usarDatosLocales(errorSupabase = null) {
     const contenedor = document.getElementById('grid-colage');
     
     // Datos de respaldo (el archivo original fotos-data.js)
@@ -137,7 +155,9 @@
     // Mostrar mensaje de que se están usando datos locales
     const mensaje = document.createElement('div');
     mensaje.className = 'mensaje-info';
-    mensaje.innerHTML = `<p>💡 <strong>Nota:</strong> Para ver las fotos subidas a Supabase, configura tu proyecto en <code>js/supabase-config.js</code></p>`;
+    mensaje.textContent = errorSupabase
+      ? 'No se pudieron cargar las fotos guardadas. Se muestran las fotos locales; revisa la consola del navegador y la configuración de Supabase.'
+      : 'Todavía no hay fotos en Supabase. Se muestran las fotos locales de respaldo.';
     mensaje.style.cssText = `
       background: var(--crema);
       border: 2px solid var(--rosa-suave);

@@ -64,15 +64,13 @@ const supabaseUrl = 'https://tuproyecto.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
 ```
 
-## 📁 Paso 6: Configurar CORS (IMPORTANTE para Vercel)
+## 📁 Paso 6: CORS y seguridad
 
-1. En tu proyecto Supabase, ve a **Settings** > **API**
-2. Busca la sección **CORS**
-3. Añade estos dominios:
-   - `http://localhost:3000` (para desarrollo local)
-   - `https://*.vercel.app` (para Vercel)
-   - `*` (para cualquier dominio, solo para desarrollo)
-4. Haz clic en "Save"
+Este sitio usa `supabase-js` desde el navegador para llamar a la Data API y Storage. Para ese flujo no tienes que añadir dominios de Vercel a una lista de CORS. La guía de CORS aplica cuando invocas una **Edge Function** desde el navegador; este proyecto no usa Edge Functions.
+
+La clave `anon` del frontend es pública por diseño. La seguridad debe estar en las políticas RLS y de Storage. El login de `index.html` es solo visual: cualquiera puede abrir directamente `subir-foto.html` y realizar las operaciones que permitan las políticas.
+
+Si decides permitir subidas públicas para este sitio, una política de inserción permite que cualquier persona con acceso al proyecto intente subir archivos. Limita el tamaño y los tipos MIME del bucket desde Supabase. Para que solo Joseph y Ohanna puedan subir, hace falta implementar autenticación real y restringir las políticas a usuarios autenticados.
 
 ## 🎯 Paso 7: Probar la Conexión
 
@@ -80,72 +78,33 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
 2. Intenta subir una foto de prueba
 3. Verifica que aparezca en el colage
 
-## 🔐 Configuración de Seguridad (Recomendado para Producción)
+## 🔐 Políticas de acceso (RLS)
 
-### Reglas de Storage (Row Level Security - RLS)
+Un bucket público permite descargar archivos sin iniciar sesión; eso **no** concede permiso para subirlos. Las subidas requieren una política de Storage. La tabla también requiere permisos y políticas compatibles con las operaciones de la app.
 
-Por defecto, con "Public Access" activado en el bucket, no necesitas configurar RLS. 
-
-Pero si quieres más seguridad, puedes desactivar "Public Access" y configurar políticas:
-
-1. Ve a **Storage** > **Policies**
-2. Crea una nueva política para el bucket `fotos`:
+Ejemplo de acceso público de lectura e inserción (úsalo solo si aceptas que visitantes anónimos puedan subir fotos):
 
 ```sql
--- Permitir lectura pública
-CREATE POLICY "Enable public read access for fotos"
-ON storage.objects FOR SELECT
+ALTER TABLE public.fotos ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Lectura pública de fotos"
+ON public.fotos FOR SELECT TO anon
+USING (true);
+
+CREATE POLICY "Inserción pública de fotos"
+ON public.fotos FOR INSERT TO anon
+WITH CHECK (true);
+
+CREATE POLICY "Lectura de objetos del bucket fotos"
+ON storage.objects FOR SELECT TO anon
 USING (bucket_id = 'fotos');
 
--- Permitir escritura pública (para subir fotos)
-CREATE POLICY "Enable public insert for fotos"
-ON storage.objects FOR INSERT
-USING (bucket_id = 'fotos');
+CREATE POLICY "Subida pública al bucket fotos"
+ON storage.objects FOR INSERT TO anon
+WITH CHECK (bucket_id = 'fotos');
 ```
 
-3. Ejecuta las políticas
-
-### Reglas de la Tabla
-
-Para la tabla `fotos`, puedes configurar políticas:
-
-```sql
--- Permitir lectura pública
-CREATE POLICY "Enable public read access for fotos table"
-ON fotos FOR SELECT USING (true);
-
--- Permitir inserción pública
-CREATE POLICY "Enable public insert for fotos table"
-ON fotos FOR INSERT USING (true);
-```
-
-## 🛠 Solución de Problemas
-
-### Error: "Invalid supabase URL"
-- Verifica que la URL no tenga espacios
-- Asegúrate de que sea la URL completa (ej: `https://tuproyecto.supabase.co`)
-
-### Error: "Invalid supabase key"
-- Verifica que la clave sea la "anon (public)"
-- No uses la clave "service_role"
-
-### Error: "Storage bucket not found"
-- Verifica que el bucket se llame exactamente `fotos`
-- Verifica que el nombre no tenga mayúsculas
-
-### Error: "Relation 'fotos' does not exist"
-- Verifica que la tabla se llame exactamente `fotos`
-- Verifica que las columnas tengan los nombres correctos
-
-### Las fotos no aparecen en el colage
-- Verifica que el bucket y la tabla tengan el mismo nombre
-- Revisa la consola del navegador (F12 > Console) para ver errores
-- Asegúrate de que el CORS esté configurado correctamente
-
-### Error de CORS
-- Verifica que el dominio de tu aplicación esté en la lista de CORS
-- Para desarrollo local, añade `http://localhost:3000`
-- Para Vercel, añade `https://*.vercel.app`
+`WITH CHECK` valida filas nuevas en una política `INSERT`; `USING` no corresponde a esa operación. Las políticas no sustituyen los permisos SQL (`GRANT`): si recibes un error de permisos, revisa también los privilegios de `anon` sobre la tabla. No crees políticas públicas de `UPDATE` o `DELETE` salvo que realmente quieras permitirlo. El formulario de acceso del sitio no protege la base de datos ni el bucket.
 
 ## 📊 Límites de Supabase
 

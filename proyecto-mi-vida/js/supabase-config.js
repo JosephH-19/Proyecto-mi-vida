@@ -35,7 +35,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
  * @param {string} frase - Frase de amor (opcional)
  * @returns {Promise<Object>} - Objeto con la foto subida
  */
-export async function agregarFoto(file, titulo, descripcion, frase = '') {
+export async function agregarFoto(file, titulo, descripcion, frase = '', fecha = '') {
   try {
     // Generar nombre único para el archivo
     const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
@@ -60,6 +60,10 @@ export async function agregarFoto(file, titulo, descripcion, frase = '') {
     const publicUrl = urlData.publicUrl;
     
     // Guardar metadatos en la base de datos
+    const fechaSubida = fecha
+      ? new Date(`${fecha}T12:00:00`).toISOString()
+      : new Date().toISOString();
+
     const { data: fotoData, error: dbError } = await supabase
       .from('fotos')
       .insert([{
@@ -68,11 +72,13 @@ export async function agregarFoto(file, titulo, descripcion, frase = '') {
         url: publicUrl,
         alt: `Foto de ${titulo}`,
         frase: frase || titulo,
-        fecha_subida: new Date().toISOString()
+        fecha_subida: fechaSubida
       }])
       .select();
     
     if (dbError) {
+      // Evitar dejar un archivo huérfano si falla el guardado de sus metadatos.
+      await supabase.storage.from('fotos').remove([filePath]);
       throw dbError;
     }
     
@@ -96,23 +102,13 @@ export async function agregarFoto(file, titulo, descripcion, frase = '') {
  * @returns {Promise<Array>} - Array de fotos ordenadas por fecha
  */
 export async function obtenerFotos() {
-  try {
-    const { data, error } = await supabase
-      .from('fotos')
-      .select('*')
-      .order('fecha_subida', { ascending: false });
-    
-    if (error) {
-      console.error('Error al obtener fotos:', error);
-      return [];
-    }
-    
-    return data || [];
-    
-  } catch (error) {
-    console.error('Error al obtener fotos:', error);
-    return [];
-  }
+  const { data, error } = await supabase
+    .from('fotos')
+    .select('*')
+    .order('fecha_subida', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
 }
 
 /**
