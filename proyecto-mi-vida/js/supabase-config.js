@@ -21,8 +21,8 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
-const supabaseUrl = 'TU_URL_DE_SUPABASE_AQUI';
-const supabaseKey = 'TU_CLAVE_PUBLICA_ANON_AQUI';
+const supabaseUrl = 'https://rmvpnvjrmztgmsrxdixd.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtdnBudmpybXp0Z21zcnhkaXhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0ODEzNDMsImV4cCI6MjEwNjA1NzM0M30.U8UAOuQIjMtppSvvuXxTdNVqiSCGz0UH4Ckv8h6EtGU';
 
 // Inicializar cliente de Supabase
 const supabase = createClient(supabaseUrl, supabaseKey);
