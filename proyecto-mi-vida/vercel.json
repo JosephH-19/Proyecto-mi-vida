@@ -2,30 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "**/*.html",
-      "use": "@vercel/static",
-      "config": { "distDir": "." }
-    },
-    {
-      "src": "css/**/*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "js/**/*.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "assets/**/*",
+      "src": "package.json",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "$1",
-      "headers": {
-        "Cache-Control": "public, max-age=3600"
-      }
+      "dest": "/"
     }
   ],
   "rewrites": [
@@ -33,6 +17,5 @@
       "source": "/",
       "destination": "/index.html"
     }
-  ],
-  "cleanUrls": true
+  ]
 }
