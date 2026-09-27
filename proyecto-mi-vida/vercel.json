@@ -8,14 +8,12 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/"
-    }
-  ],
-  "rewrites": [
+      "src": "/",
+      "dest": "/index.html"
+    },
     {
-      "source": "/",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
