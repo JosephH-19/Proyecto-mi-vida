@@ -3,7 +3,8 @@
   "builds": [
     {
       "src": "**/*.html",
-      "use": "@vercel/static"
+      "use": "@vercel/static",
+      "config": { "distDir": "." }
     },
     {
       "src": "css/**/*.css",
@@ -32,5 +33,6 @@
       "source": "/",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "cleanUrls": true
 }

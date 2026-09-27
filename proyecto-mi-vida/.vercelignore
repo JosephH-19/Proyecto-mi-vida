@@ -1,0 +1,18 @@
+# Ignorar archivos que no son necesarios para el despliegue
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Archivos de desarrollo
+*.md
+*.txt
+.idea/
+.vscode/
+
+# Archivos locales que no deben subir
+.env
+.env.*
+
+# Backup y temporales
+*.bak
+*.tmp
