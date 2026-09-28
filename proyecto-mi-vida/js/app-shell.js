@@ -21,8 +21,8 @@ function montarPersonalizacion() {
   tema.type = 'button';
   tema.className = 'boton-herramienta';
   tema.setAttribute('aria-label', 'Cambiar tema claro u oscuro');
-  tema.textContent = oscuro ? '☀️ Tema' : '🌙 Tema';
   const oscuro = localStorage.getItem('mi-vida-tema') === 'oscuro';
+  tema.textContent = oscuro ? '☀️ Tema' : '🌙 Tema';
   document.documentElement.dataset.tema = oscuro ? 'oscuro' : 'claro';
   tema.setAttribute('aria-pressed', String(oscuro));
   tema.addEventListener('click', () => {
