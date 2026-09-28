@@ -149,3 +149,6 @@ const FOTOS = [
     frase: "Me gustan estas porque recuerdo lo que siento"
   }
 ];
+
+// El collage de cumpleaños reutiliza el catálogo local de fotos.
+if (typeof window !== 'undefined') window.FOTOS = FOTOS;
