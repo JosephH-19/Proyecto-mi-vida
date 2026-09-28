@@ -2,7 +2,7 @@
 
 Sitio privado de recuerdos para Joseph y Ohanna: galería Supabase, música de YouTube y páginas para celebrar su historia.
 
-> **Versión 1.1:** se trabaja en la rama `version1.1`. `main` y el despliegue actual no cambian hasta que revises y promociones la rama. Las funciones de Supabase nuevas requieren los pasos de [AUTENTICACION-V1.1.md](AUTENTICACION-V1.1.md).
+> **Mejora de cumpleaños:** se prepara en la rama `feature/cumpleanos-dinamico`; `main` no cambia hasta que revises y fusiones esa rama. Requiere ejecutar la migración v1.2 indicada abajo.
 
 ## Funciones
 
@@ -14,6 +14,7 @@ Sitio privado de recuerdos para Joseph y Ohanna: galería Supabase, música de Y
 - Diario compartido, fechas especiales, recordatorios al visitar la página y exportación `.ics` compatible con Google Calendar.
 - Mapa OpenStreetMap configurable sin clave de Google.
 - Chat con notas de voz privadas y estadísticas de visitas por cuenta.
+- Cumpleaños dinámicos, collage anual con las fotos locales, registro compartido de regalos y mensajes de cumpleaños.
 
 ## Requisitos de la rama v1.1
 
@@ -33,6 +34,10 @@ El bucket actual `fotos` mantiene sus URLs públicas para no romper la galería 
 
 La migración afecta al proyecto Supabase donde la ejecutes, aunque es aditiva y conserva el acceso anónimo de fotos existente. Si tienes un proyecto de pruebas, úsalo primero.
 
+## Cumpleaños v1.2
+
+La página detecta el cumpleaños según las fechas configuradas en `js/cumpleanos.js` (actualmente Joseph: 11 de enero; Ohanna: 7 de octubre). El collage combina de forma determinista las fotos de `assets/fotos` y abre cada recuerdo ampliado. El registro de regalos y los mensajes compartidos necesitan la migración `database/version1.2-cumpleanos.sql` ejecutada en Supabase SQL Editor. Solo las dos cuentas autenticadas deben tener acceso; mantén desactivados los registros públicos.
+
 ## Calendario y mapa
 
 La página de fechas descarga un archivo `.ics` que se puede importar en Google Calendar; no hay sincronización OAuth en vivo. Incluye recordatorios de un día antes. Las notificaciones del navegador aparecen cuando se visita la página de fechas y el navegador concede permiso.
@@ -51,7 +56,7 @@ Luego abre `http://localhost:8000` y usa una de las dos cuentas de Supabase.
 
 ## Despliegue
 
-Vercel está configurado para publicar los HTML, CSS, JavaScript y recursos estáticos. El proyecto debe tener como Root Directory la carpeta `proyecto-mi-vida`. Los pushes a `version1.1` generan Preview; el dominio de producción se actualiza al promover los cambios a la rama configurada para Production.
+Vercel está configurado para publicar los HTML, CSS, JavaScript y recursos estáticos. El proyecto debe tener como Root Directory la carpeta `proyecto-mi-vida`. Los pushes a `feature/cumpleanos-dinamico` generan Preview; el dominio de producción se actualiza al promover los cambios a la rama configurada para Production.
 
 ## Estructura relevante
 
@@ -59,8 +64,9 @@ Vercel está configurado para publicar los HTML, CSS, JavaScript y recursos est�
 - `colage.html`: galería, filtros, lightbox, comentarios y reacciones.
 - `subir-foto.html`: subida, álbumes, etiquetas y ubicación.
 - `espacio.html`, `diario.html`, `fechas.html`, `mapa.html`, `chat.html`, `estadisticas.html`: módulos de la relación.
+- `cumpleanos.html`, `js/cumpleanos.js`, `css/cumpleanos.css`: página de cumpleaños y sus recuerdos.
 - `js/supabase-config.js`: cliente público de Supabase.
-- `database/version1.1.sql`: migración manual y políticas RLS.
+- `database/version1.1.sql` y `database/version1.2-cumpleanos.sql`: migraciones manuales y políticas RLS.
 - `AUTENTICACION-V1.1.md`: preparación de las dos cuentas.
 
 Hecho con ❤️ por Joseph para Ohanna.
