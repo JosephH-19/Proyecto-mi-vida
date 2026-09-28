@@ -1,193 +1,74 @@
-/**
- * Módulo de música de fondo para Proyecto Mi Vida
- * Reproduce videos de YouTube como música de fondo con control de volumen
- * 
- * Usa la API de YouTube IFrame Player para tener control completo
- */
-
-// URL del video de YouTube (puede ser cualquier URL de YouTube)
-const YOUTUBE_VIDEO_ID = 'p_1Osm5xE5Y'; // Video: "Te amo y más" alternativo
-// const YOUTUBE_VIDEO_ID = 'QAItMep0GiA'; // Video original que mencionaste
-
-// Configuración del player
+/** Reproductor opcional de YouTube con controles y playlist personalizable. */
+const PLAYLIST_PREDETERMINADA = [
+  { id: 'p_1Osm5xE5Y', nombre: 'Te amo y más' },
+  { id: 'QAItMep0GiA', nombre: 'Nuestra canción' }
+];
+const STORAGE_KEY = 'mi-vida-playlist';
 let player = null;
-let musicaIniciada = false;
-let volumenDeseado = 0.5; // Volumen medio (0.0 - 1.0)
+let apiEnCarga = null;
+let playlist = leerPlaylist();
+let indice = 0;
+let contenedor;
 
-// Cargar la API de YouTube IFrame
-function cargarAPIYouTube() {
-  return new Promise((resolve) => {
-    if (window.YT) {
-      resolve();
-      return;
-    }
-    
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    
-    window.onYouTubeIframeAPIReady = () => {
-      resolve();
-    };
-  });
-}
-
-// Crear el contenedor del player
-function crearContenedorPlayer() {
-  const container = document.createElement('div');
-  container.id = 'youtube-player-container';
-  container.style.cssText = `
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 0;
-    height: 0;
-    opacity: 0;
-    z-index: -100;
-    pointer-events: none;
-  `;
-  
-  const playerDiv = document.createElement('div');
-  playerDiv.id = 'youtube-player';
-  playerDiv.style.cssText = `
-    width: 1px;
-    height: 1px;
-  `;
-  container.appendChild(playerDiv);
-  document.body.appendChild(container);
-  
-  return playerDiv;
-}
-
-// Iniciar el player
-export async function iniciarMusica() {
-  if (musicaIniciada) return;
-  
+function leerPlaylist() {
   try {
-    // Esperar a que la API de YouTube esté lista
-    await cargarAPIYouTube();
-    
-    // Crear contenedor
-    const playerContainer = crearContenedorPlayer();
-    
-    // Crear player
-    player = new YT.Player('youtube-player', {
-      videoId: YOUTUBE_VIDEO_ID,
-      playerVars: {
-        autoplay: 1,
-        controls: 0,
-        modestbranding: 1,
-        rel: 0,
-        fs: 0,
-        iv_load_policy: 3,
-        loop: 1,
-        playlist: YOUTUBE_VIDEO_ID
-      },
-      events: {
-        onReady: (event) => {
-          event.target.setVolume(volumenDeseado * 100);
-          event.target.playVideo();
-          musicaIniciada = true;
-          
-          // Ocultar el botón si existe
-          const btn = document.getElementById('btn-musica-global');
-          if (btn) {
-            btn.style.display = 'none';
-          }
-        },
-        onError: (event) => {
-          console.error('Error en el player de YouTube:', event.data);
-          mostrarBotonMusica();
-        },
-        onStateChange: (event) => {
-          // Si el video termina, vuelve a empezar (por si el loop no funciona)
-          if (event.data === YT.PlayerState.ENDED) {
-            player.seekTo(0);
-            player.playVideo();
-          }
-        }
-      }
-    });
-    
-  } catch (error) {
-    console.error('Error al cargar música de YouTube:', error);
-    mostrarBotonMusica();
-  }
+    const guardada = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    return Array.isArray(guardada) && guardada.length ? guardada : [...PLAYLIST_PREDETERMINADA];
+  } catch { return [...PLAYLIST_PREDETERMINADA]; }
 }
 
-// Mostrar botón de música si hay error
-function mostrarBotonMusica() {
-  const btn = document.createElement('button');
-  btn.id = 'btn-musica-global';
-  btn.innerHTML = '🎵 Reproducir música';
-  btn.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 9999;
-    padding: 12px 20px;
-    background: #E8A2B0;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(232, 162, 176, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-  `;
-  
-  btn.addEventListener('click', async () => {
-    if (!player) {
-      await iniciarMusica();
-      return;
-    }
-    
-    if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-      player.pauseVideo();
-      btn.innerHTML = '🎵 Reproducir música';
-      btn.style.background = '#E8A2B0';
-      btn.style.color = 'white';
-    } else {
-      player.playVideo();
-      btn.innerHTML = '⏸ Pausar música';
-      btn.style.background = '#F6D374';
-      btn.style.color = '#4A3B42';
-    }
+function guardarPlaylist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(playlist)); }
+
+function montarDock() {
+  if (document.getElementById('music-dock')) return;
+  const dock = document.createElement('aside');
+  dock.id = 'music-dock'; dock.className = 'music-dock';
+  dock.innerHTML = '<button class="music-trigger" type="button" aria-expanded="false">🎵 Música</button><section class="music-panel" hidden><div id="youtube-player-container"></div><label class="music-selection">Playlist<select id="music-selection"></select></label><div class="music-controls"><button type="button" data-accion="anterior" aria-label="Canción anterior">⏮</button><button type="button" data-accion="play">▶ Reproducir</button><button type="button" data-accion="siguiente" aria-label="Siguiente canción">⏭</button></div><label class="music-volume">Volumen <input type="range" min="0" max="100" value="45"></label><form class="music-add"><input type="url" placeholder="Pega un enlace de YouTube" aria-label="Enlace de YouTube" required><button>Agregar</button></form><p class="music-status" aria-live="polite">La música empieza cuando pulses reproducir.</p></section>';
+  document.body.append(dock); contenedor = dock;
+  const trigger=dock.querySelector('.music-trigger'), panel=dock.querySelector('.music-panel');
+  trigger.addEventListener('click',()=>{panel.hidden=!panel.hidden;trigger.setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)renderPlaylist();});
+  dock.querySelector('[data-accion="play"]').addEventListener('click',reproducir);
+  dock.querySelector('[data-accion="siguiente"]').addEventListener('click',()=>cambiarCancion(1));
+  dock.querySelector('[data-accion="anterior"]').addEventListener('click',()=>cambiarCancion(-1));
+  dock.querySelector('.music-volume input').addEventListener('input',e=>player?.setVolume(Number(e.target.value)));
+  dock.querySelector('#music-selection').addEventListener('change',e=>{indice=Number(e.target.value)||0;if(player)player.loadVideoById(playlist[indice].id);});
+  dock.querySelector('.music-add').addEventListener('submit',e=>{e.preventDefault();const input=e.currentTarget.querySelector('input');const id=extraerVideoId(input.value);if(!id){dock.querySelector('.music-status').textContent='Ese enlace de YouTube no parece válido.';return;}playlist.push({id,nombre:`Canción ${playlist.length+1}`});indice=playlist.length-1;guardarPlaylist();renderPlaylist();input.value='';if(player)player.loadVideoById(id);dock.querySelector('.music-status').textContent='Canción agregada a tu playlist.';});
+  renderPlaylist();
+}
+
+function renderPlaylist(){
+  if(!contenedor)return;
+  const select=contenedor.querySelector('#music-selection');select.replaceChildren();
+  playlist.forEach((cancion,i)=>{const option=document.createElement('option');option.value=i;option.textContent=cancion.nombre;select.append(option);});select.value=String(indice);
+}
+
+function extraerVideoId(valor){
+  try{const url=new URL(valor);if(!['youtube.com','www.youtube.com','m.youtube.com','youtu.be','www.youtube-nocookie.com'].includes(url.hostname))return null;let id=url.searchParams.get('v');if(url.hostname.endsWith('youtu.be'))id=url.pathname.split('/').filter(Boolean)[0];if(!id){const match=url.pathname.match(/\/(?:embed|shorts|live)\/([\w-]{11})/);id=match?.[1];}return /^[\w-]{11}$/.test(id||'')?id:null;}catch{return /^[\w-]{11}$/.test(valor)?valor:null;}
+}
+
+function cargarAPI(){
+  if(window.YT?.Player)return Promise.resolve();
+  if(apiEnCarga)return apiEnCarga;
+  apiEnCarga=new Promise((resolve,reject)=>{
+    const anterior=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=()=>{try{anterior?.();}finally{resolve();}};
+    const script=document.createElement('script');script.src='https://www.youtube.com/iframe_api';script.onerror=()=>reject(new Error('No se pudo cargar YouTube'));document.head.append(script);
+    setTimeout(()=>{if(!window.YT?.Player)reject(new Error('YouTube tardó demasiado en cargar'));},12000);
   });
-  
-  document.body.appendChild(btn);
+  return apiEnCarga;
 }
 
-// Función para alternar música
-export function toggleMusica() {
-  if (!player) {
-    iniciarMusica();
-    return;
-  }
-  
-  if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-    player.pauseVideo();
-  } else {
-    player.playVideo();
-  }
+async function asegurarPlayer(){
+  if(player)return;
+  await cargarAPI();
+  player=new YT.Player('youtube-player-container',{width:'320',height:'180',videoId:playlist[indice].id,playerVars:{autoplay:0,controls:0,rel:0,playsinline:1,origin:location.origin,enablejsapi:1},events:{onReady:event=>{event.target.setVolume(Number(contenedor.querySelector('.music-volume input').value));},onStateChange:event=>{if(event.data===YT.PlayerState.ENDED)cambiarCancion(1);}}});
 }
 
-// Ajustar volumen
-export function setVolumen(volumen) {
-  volumenDeseado = Math.min(1, Math.max(0, volumen));
-  if (player) {
-    player.setVolume(volumenDeseado * 100);
-  }
+async function reproducir(){
+  const status=contenedor.querySelector('.music-status');
+  try{await asegurarPlayer();if(player.getPlayerState?.()===YT.PlayerState.PLAYING){player.pauseVideo();contenedor.querySelector('[data-accion="play"]').textContent='▶ Reproducir';return;}player.loadVideoById(playlist[indice].id);contenedor.querySelector('[data-accion="play"]').textContent='⏸ Pausar';status.textContent='Si no comienza, vuelve a pulsar reproducir en el video.';}
+  catch(error){console.error('No se pudo iniciar YouTube:',error);status.textContent='No se pudo cargar YouTube. Comprueba la conexión e inténtalo otra vez.';}
 }
+function cambiarCancion(delta){indice=(indice+delta+playlist.length)%playlist.length;renderPlaylist();if(player)player.loadVideoById(playlist[indice].id);}
 
-// Iniciar música cuando el DOM esté listo
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(iniciarMusica, 1000);
-  });
-} else {
-  setTimeout(iniciarMusica, 1000);
-}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',montarDock,{once:true});else montarDock();

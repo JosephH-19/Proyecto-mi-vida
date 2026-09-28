@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>document.documentElement.classList.add('sesion-pendiente')</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nuestro colage 🤍</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/colage.css">
+  <script type="module" src="js/app-shell.js"></script>
 </head>
 <body>
 
@@ -25,6 +27,13 @@
   <p class="colage-sub">Cada foto es un pedacito de lo mucho que te amo.</p>
 </header>
 
+<section class="filtros-galeria" aria-label="Filtrar recuerdos">
+  <label>Año <select id="filtro-anio"><option value="">Todos</option></select></label>
+  <label>Álbum <select id="filtro-album"><option value="">Todos</option></select></label>
+  <label>Buscar etiqueta o recuerdo <input id="filtro-texto" type="search" placeholder="playa, aniversario…"></label>
+  <button id="limpiar-filtros" type="button" class="boton-herramienta">Limpiar</button>
+</section>
+<p id="total-fotos" class="contador-fotos" aria-live="polite"></p>
 <main id="grid-colage" class="grid-colage">
   <div class="cargando-colage">
     <div class="spinner"></div>
@@ -38,10 +47,13 @@
 <script src="js/petalos.js"></script>
 <script type="module" src="js/musica.js"></script>
 <script type="module">
-  import { obtenerFotosParaColage } from './js/supabase-config.js';
+  import { obtenerFotosParaColage, supabase } from './js/supabase-config.js';
 
   document.getElementById('doodle-header').innerHTML = svgLirio(50) + svgPerrito(70) + svgLirio(50);
   iniciarLluviaDeFlores('lluvia-petalos', 1400);
+  let todasLasFotos = [];
+  let dialogoFoto;
+  let fotoActual = 0;
 
   function crearTarjetaFoto(foto) {
     const tarjeta = document.createElement('article');
@@ -53,6 +65,11 @@
     imagen.src = foto.src || foto.url || '';
     imagen.alt = foto.alt || foto.titulo || 'Foto del colage';
     imagen.loading = 'lazy';
+    imagen.tabIndex = 0;
+    imagen.setAttribute('role', 'button');
+    imagen.setAttribute('aria-label', `Ampliar ${foto.titulo || foto.alt || 'foto'}`);
+    imagen.addEventListener('click', () => abrirFoto(foto));
+    imagen.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); abrirFoto(foto); } });
     imagen.addEventListener('error', () => {
       imagen.classList.add('sin-foto');
       imagen.alt = `${foto.alt || foto.titulo || 'Foto'} (foto no disponible)`;
@@ -69,6 +86,21 @@
     frase.className = 'frase-foto manuscrita';
     frase.textContent = foto.frase || foto.titulo || '';
     tarjeta.append(marco, descripcion, frase);
+    const etiquetas = document.createElement('div');
+    etiquetas.className = 'etiquetas-foto';
+    [foto.album || 'General', ...(foto.etiquetas || [])].forEach(etiqueta => {
+      const chip = document.createElement('span'); chip.textContent = etiqueta; etiquetas.append(chip);
+    });
+    tarjeta.append(etiquetas);
+    if (foto.ubicacion) {
+      const lugar = document.createElement('a'); lugar.className = 'enlace-mapa-foto';
+      lugar.textContent = `📍 ${foto.ubicacion}`;
+      if (foto.latitud != null && foto.longitud != null && Number.isFinite(Number(foto.latitud)) && Number.isFinite(Number(foto.longitud))) {
+        lugar.href = `https://www.openstreetmap.org/?mlat=${encodeURIComponent(foto.latitud)}&mlon=${encodeURIComponent(foto.longitud)}#map=15/${encodeURIComponent(foto.latitud)}/${encodeURIComponent(foto.longitud)}`;
+        lugar.target = '_blank'; lugar.rel = 'noopener noreferrer';
+      }
+      tarjeta.append(lugar);
+    }
 
     if (foto.fecha) {
       const fecha = document.createElement('p');
@@ -80,27 +112,114 @@
   }
 
   async function renderizarColage() {
-    const contenedor = document.getElementById('grid-colage');
-    
     try {
-      // Intentar con Supabase
-      const fotos = await obtenerFotosParaColage();
-      
-      if (fotos.length > 0) {
-        contenedor.innerHTML = '';
-        fotos.forEach((foto) => {
-          contenedor.appendChild(crearTarjetaFoto(foto));
-        });
+      todasLasFotos = await obtenerFotosParaColage();
+      if (!todasLasFotos.length) {
+        usarDatosLocales();
         return;
       }
-      
-      // Si no hay fotos en Supabase, usar datos locales de respaldo
-      console.log('Supabase no devolvió fotos, usando datos locales...');
-      usarDatosLocales();
-      
+      prepararFiltros();
+      renderizarFiltradas();
+      const idCompartido = new URLSearchParams(location.search).get('foto');
+      const fotoCompartida = todasLasFotos.find(foto => foto.id === idCompartido);
+      if (fotoCompartida) abrirFoto(fotoCompartida);
     } catch (error) {
       console.error('No se pudieron cargar las fotos de Supabase:', error);
       usarDatosLocales(error);
+    }
+  }
+
+  function prepararFiltros() {
+    const anios = [...new Set(todasLasFotos.map(f => f.fecha instanceof Date ? f.fecha.getFullYear() : new Date(f.fecha).getFullYear()).filter(Number.isFinite))].sort((a,b) => b-a);
+    const albumes = [...new Set(todasLasFotos.map(f => f.album || 'General'))].sort((a,b) => a.localeCompare(b, 'es'));
+    const selectorAnio = document.getElementById('filtro-anio');
+    const selectorAlbum = document.getElementById('filtro-album');
+    anios.forEach(anio => { const o=document.createElement('option'); o.value=anio; o.textContent=anio; selectorAnio.append(o); });
+    albumes.forEach(album => { const o=document.createElement('option'); o.value=album; o.textContent=album; selectorAlbum.append(o); });
+    ['filtro-anio', 'filtro-album', 'filtro-texto'].forEach(id => document.getElementById(id).addEventListener(id === 'filtro-texto' ? 'input' : 'change', renderizarFiltradas));
+    document.getElementById('limpiar-filtros').addEventListener('click', () => {
+      selectorAnio.value = ''; selectorAlbum.value = ''; document.getElementById('filtro-texto').value = ''; renderizarFiltradas();
+    });
+  }
+
+  function renderizarFiltradas() {
+    const anio = document.getElementById('filtro-anio').value;
+    const album = document.getElementById('filtro-album').value;
+    const texto = document.getElementById('filtro-texto').value.trim().toLocaleLowerCase('es');
+    const visibles = todasLasFotos.filter(foto => {
+      const coincideAnio = !anio || new Date(foto.fecha).getFullYear() === Number(anio);
+      const coincideAlbum = !album || (foto.album || 'General') === album;
+      const busqueda = [foto.titulo, foto.descripcion, foto.frase, foto.ubicacion, foto.album, ...(foto.etiquetas || [])].join(' ').toLocaleLowerCase('es');
+      return coincideAnio && coincideAlbum && (!texto || busqueda.includes(texto));
+    });
+    const contenedor = document.getElementById('grid-colage');
+    contenedor.replaceChildren(...visibles.map(crearTarjetaFoto));
+    document.getElementById('total-fotos').textContent = `${visibles.length} de ${todasLasFotos.length} recuerdos`;
+  }
+
+  function abrirFoto(foto) {
+    if (!dialogoFoto) {
+      dialogoFoto = document.createElement('dialog');
+      dialogoFoto.className = 'lightbox-foto';
+      dialogoFoto.innerHTML = '<button class="lightbox-cerrar" aria-label="Cerrar">×</button><button class="lightbox-anterior" aria-label="Foto anterior">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lightbox-siguiente" aria-label="Foto siguiente">›</button><button class="lightbox-zoom">Acercar</button><a class="lightbox-whatsapp" target="_blank" rel="noopener noreferrer">Compartir por WhatsApp</a><section class="interacciones-lightbox"><div class="reacciones-lightbox"></div><div class="comentarios-lightbox"></div></section>';
+      document.body.append(dialogoFoto);
+      dialogoFoto.querySelector('.lightbox-cerrar').addEventListener('click', () => dialogoFoto.close());
+      dialogoFoto.addEventListener('click', e => { if (e.target === dialogoFoto) dialogoFoto.close(); });
+      dialogoFoto.querySelector('.lightbox-anterior').addEventListener('click', () => moverFoto(-1));
+      dialogoFoto.querySelector('.lightbox-siguiente').addEventListener('click', () => moverFoto(1));
+      dialogoFoto.querySelector('.lightbox-zoom').addEventListener('click', e => {
+        const imagen = dialogoFoto.querySelector('figure img'); imagen.classList.toggle('zoom-activo'); e.currentTarget.textContent = imagen.classList.contains('zoom-activo') ? 'Alejar' : 'Acercar';
+      });
+    }
+    fotoActual = Math.max(0, todasLasFotos.findIndex(f => f.id === foto.id));
+    pintarLightbox(foto);
+    if (!dialogoFoto.open) dialogoFoto.showModal();
+  }
+
+  function moverFoto(delta) {
+    if (!todasLasFotos.length) return;
+    fotoActual = (fotoActual + delta + todasLasFotos.length) % todasLasFotos.length;
+    pintarLightbox(todasLasFotos[fotoActual]);
+  }
+
+  async function pintarLightbox(foto) {
+    const imagen = dialogoFoto.querySelector('figure img');
+    imagen.src = foto.src || foto.url; imagen.alt = foto.alt || foto.titulo || 'Recuerdo'; imagen.classList.remove('zoom-activo');
+    dialogoFoto.querySelector('figcaption').textContent = `${foto.titulo || ''} · ${foto.descripcion || ''}`;
+    const shareUrl = new URL(location.href); if (foto.id) shareUrl.searchParams.set('foto', foto.id);
+    dialogoFoto.querySelector('.lightbox-whatsapp').href = `https://wa.me/?text=${encodeURIComponent(`${foto.titulo || 'Un recuerdo nuestro'} ${shareUrl.href}`)}`;
+    await cargarInteracciones(foto);
+  }
+
+  async function cargarInteracciones(foto) {
+    const zona = dialogoFoto.querySelector('.reacciones-lightbox');
+    const comentarios = dialogoFoto.querySelector('.comentarios-lightbox');
+    zona.replaceChildren(); comentarios.replaceChildren();
+    if (!foto.id) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    const emojis = ['❤️', '😍', '🥰', '😂', '✨'];
+    const { data: reacciones = [] } = await supabase.from('reacciones_fotos').select('emoji,creado_por').eq('foto_id', foto.id);
+    emojis.forEach(emoji => {
+      const boton = document.createElement('button'); boton.type = 'button';
+      boton.textContent = `${emoji} ${reacciones.filter(r => r.emoji === emoji).length}`;
+      boton.disabled = !user;
+      boton.addEventListener('click', async () => {
+        const propia = reacciones.find(r => r.creado_por === user.id);
+        if (propia?.emoji === emoji) await supabase.from('reacciones_fotos').delete().eq('foto_id', foto.id).eq('creado_por', user.id);
+        else await supabase.from('reacciones_fotos').upsert({ foto_id: foto.id, emoji, creado_por: user.id }, { onConflict: 'foto_id,creado_por' });
+        pintarLightbox(foto);
+      });
+      zona.append(boton);
+    });
+    const { data: lista = [], error } = await supabase.from('comentarios_fotos').select('contenido,creado_por,creado_en').eq('foto_id', foto.id).order('creado_en');
+    if (error) { const aviso=document.createElement('p'); aviso.textContent='Activa las políticas de comentarios de la migración v1.1.'; comentarios.append(aviso); return; }
+    lista.forEach(comentario => { const p=document.createElement('p'); p.textContent=`${comentario.creado_por === user?.id ? 'Tú' : 'Tu pareja'}: ${comentario.contenido}`; comentarios.append(p); });
+    if (user) {
+      const form=document.createElement('form'); form.className='form-comentario';
+      const campo=document.createElement('input'); campo.maxLength=2000; campo.required=true; campo.placeholder='Deja un comentario…'; campo.setAttribute('aria-label','Comentario');
+      const enviar=document.createElement('button'); enviar.textContent='Enviar'; form.append(campo,enviar);
+      form.addEventListener('submit', async e => { e.preventDefault(); const {error:err}=await supabase.from('comentarios_fotos').insert({foto_id:foto.id,contenido:campo.value.trim(),creado_por:user.id}); if (!err) pintarLightbox(foto); else alert('No se pudo guardar el comentario. Revisa la migración v1.1.'); });
+      comentarios.append(form);
     }
   }
 
@@ -147,10 +266,9 @@
       }
     ];
     
-    contenedor.innerHTML = '';
-    FOTOS_LOCAL.forEach((foto) => {
-      contenedor.appendChild(crearTarjetaFoto(foto));
-    });
+    todasLasFotos = FOTOS_LOCAL.map(foto => ({ ...foto, album: 'General', etiquetas: [] }));
+    prepararFiltros();
+    renderizarFiltradas();
     
     // Mostrar mensaje de que se están usando datos locales
     const mensaje = document.createElement('div');

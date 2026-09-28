@@ -15,17 +15,19 @@
     <div class="login-doodles" id="doodle-header"></div>
 
     <h1>Para mi Ohanna</h1>
-    <p class="login-sub">Un rinconcito hecho solo para nosotros dos.</p>
+    <p class="login-sub">Un rinconcito hecho solo para nosotros dos. Inicia sesión con una cuenta creada en Supabase.</p>
 
     <form id="form-login" autocomplete="off">
-      <label for="clave">Escribe tu nombre o nuestra clave</label>
-      <input type="text" id="clave" name="clave" placeholder="Ohanna, Joseph o la clave..." required>
+      <label for="correo">Correo de tu cuenta de pareja</label>
+      <input type="email" id="correo" name="correo" autocomplete="username" placeholder="tu-correo@example.com" required>
+      <label for="clave">Contraseña</label>
+      <input type="password" id="clave" name="clave" autocomplete="current-password" placeholder="Contraseña de Supabase" required>
       <button type="submit">Entrar</button>
       <p id="mensaje-error" class="mensaje-error" role="alert" aria-live="polite"></p>
     </form>
 
     <div class="reproductor">
-      <p class="nota-musica">La música se reproducirá automáticamente al entrar</p>
+      <p class="nota-musica">Abre el control 🎵 para elegir una canción y reproducirla</p>
     </div>
   </section>
 </main>
@@ -40,22 +42,44 @@
   document.getElementById('doodle-header').innerHTML = svgPerrito(80) + svgPajarito(36);
   iniciarLluviaDeFlores();
 
-  const CODIGOS_VALIDOS = ['josephohanna', 'joseph', 'ohanna'];
-  const form = document.getElementById('form-login');
-  const mensajeError = document.getElementById('mensaje-error');
-
-  form.addEventListener('submit', (e) => {
+  document.getElementById('form-login').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const valor = document.getElementById('clave').value.trim().toLowerCase();
+    const form = e.currentTarget;
+    const boton = form.querySelector('button[type="submit"]');
+    const mensaje = document.getElementById('mensaje-error');
+    mensaje.textContent = '';
+    boton.disabled = true;
+    boton.textContent = 'Entrando...';
 
-    if (CODIGOS_VALIDOS.includes(valor)) {
-      mensajeError.textContent = '';
+    try {
+      const { supabase } = await import('./js/supabase-config.js');
+      const { error } = await supabase.auth.signInWithPassword({
+        email: document.getElementById('correo').value.trim(),
+        password: document.getElementById('clave').value
+      });
+      if (error) throw error;
       document.querySelector('.login-tarjeta').classList.add('desvanecer');
-      setTimeout(() => { window.location.href = 'colage.html'; }, 900);
-    } else {
-      mensajeError.textContent = 'Ese no es nuestro secreto... inténtalo de nuevo 💭';
+      const candidato = new URLSearchParams(location.search).get('return') || 'colage.html';
+      const destino = /^[a-z0-9-]+\.html$/i.test(candidato) && candidato !== 'index.html' ? candidato : 'colage.html';
+      setTimeout(() => location.replace(destino), 250);
+    } catch (error) {
+      mensaje.textContent = error.message?.includes('Invalid login credentials')
+        ? 'Correo o contraseña incorrectos. Revisa tus datos.'
+        : 'No se pudo iniciar sesión. Revisa que la cuenta esté creada y vuelve a intentarlo.';
+      boton.disabled = false;
+      boton.textContent = 'Entrar';
     }
   });
+</script>
+<script type="module">
+  import { supabase } from './js/supabase-config.js';
+  const params = new URLSearchParams(location.search);
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session && params.get('error') !== 'session') {
+    const candidato = params.get('return') || 'colage.html';
+    const destino = /^[a-z0-9-]+\.html$/i.test(candidato) && candidato !== 'index.html' ? candidato : 'colage.html';
+    location.replace(destino);
+  }
 </script>
 </body>
 </html>

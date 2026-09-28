@@ -1,0 +1,29 @@
+.pagina-espacio { position:relative; z-index:2; width:min(900px,92vw); margin:2em auto 4em; padding:clamp(1em,4vw,2.5em); background:var(--blanco); border:2px solid var(--rosa-suave); border-radius:var(--radio); box-shadow:var(--sombra); }
+.pagina-espacio>h1,.pagina-espacio>p { text-align:center; }
+.tarjetas-espacio { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1em; margin-top:2em; }
+.tarjetas-espacio>a { display:block; padding:1.2em; color:var(--tinta); text-decoration:none; border:1px solid var(--rosa-suave); border-radius:16px; background:var(--crema); transition:transform .2s,box-shadow .2s; }
+.tarjetas-espacio>a:hover { transform:translateY(-3px); box-shadow:var(--sombra); }
+.tarjetas-espacio>a>span { font-size:1.8rem; }
+.form-espacio { display:grid; gap:.8em; margin:1.5em 0 2em; }
+.form-espacio label { display:grid; gap:.35em; font-weight:600; }
+.form-espacio input,.form-espacio textarea { border:2px solid var(--rosa-suave); border-radius:12px; padding:.75em; font:inherit; background:var(--crema); color:var(--tinta); }
+.form-espacio .checkbox { display:flex; align-items:center; gap:.6em; }
+.lista-espacio { display:grid; gap:.8em; }
+.lista-espacio article { padding:1em 1.2em; background:var(--crema); border-left:4px solid var(--rosa-profundo); border-radius:12px; }
+.lista-espacio article h2,.lista-espacio article h3 { margin:0 0 .25em; }
+.lista-espacio article p { white-space:pre-wrap; }
+.acciones-fechas { display:flex; gap:.7em; flex-wrap:wrap; justify-content:center; margin-bottom:1.5em; }
+#estado-diario,#estado-fecha { min-height:1.2em; color:var(--rosa-profundo); }
+.mapa-recuerdos iframe { width:100%; height:min(55vh,500px); border:0; border-radius:14px; }
+.lista-espacio .lugar-mapa { justify-self:start; background:var(--crema); color:var(--tinta); border:1px solid var(--rosa-suave); }
+.mensajes-chat { display:flex; flex-direction:column; gap:.6em; max-height:55vh; overflow:auto; padding:1em; background:var(--crema); border-radius:16px; }
+.burbuja-chat { max-width:min(82%,600px); padding:.7em 1em; border-radius:16px; background:var(--blanco); box-shadow:0 3px 10px rgba(0,0,0,.06); }
+.burbuja-chat.mio { align-self:flex-end; background:var(--rosa-suave); }
+.burbuja-chat.pareja { align-self:flex-start; border:1px solid var(--rosa-suave); }
+.burbuja-chat p { white-space:pre-wrap; overflow-wrap:anywhere; }
+.burbuja-chat small { display:block; opacity:.7; text-align:right; }
+.burbuja-chat audio { display:block; max-width:100%; margin:.5em 0; }
+.tarjetas-estadistica { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.8em; }
+.estadistica { background:var(--crema); padding:1.2em; border-radius:14px; text-align:center; }
+.estadistica strong { font:700 2.2rem 'Caveat',cursive; color:var(--rosa-profundo); }
+.nota-privacidad { font-size:.85rem; opacity:.75; text-align:center; margin-top:1.5em; }

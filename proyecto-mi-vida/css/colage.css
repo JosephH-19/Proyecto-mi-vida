@@ -68,3 +68,28 @@
   color: var(--rosa-profundo);
   line-height: 1.15;
 }
+
+.filtros-galeria { display:flex; flex-wrap:wrap; gap:.75em; justify-content:center; align-items:end; max-width:1100px; margin:0 auto 1em; padding:0 1em; position:relative; z-index:2; }
+.filtros-galeria label { display:grid; gap:.3em; color:var(--tinta); font-size:.9rem; }
+.filtros-galeria select, .filtros-galeria input { min-width:150px; padding:.65em .8em; border:2px solid var(--rosa-suave); border-radius:12px; background:var(--blanco); color:var(--tinta); font:inherit; }
+.contador-fotos { position:relative; z-index:2; text-align:center; margin:.5em; color:var(--tinta); }
+.etiquetas-foto { display:flex; gap:.35em; flex-wrap:wrap; margin:.55em .2em; }
+.etiquetas-foto span { padding:.2em .6em; border-radius:999px; background:var(--crema); color:var(--tinta); font-size:.76rem; }
+.enlace-mapa-foto { display:inline-block; margin:.3em .2em; font-size:.85rem; }
+.marco-foto img[role="button"] { cursor:zoom-in; }
+.lightbox-foto { position:fixed; width:min(94vw,900px); max-width:none; max-height:92vh; padding:1.2em; border:2px solid var(--rosa-suave); border-radius:20px; background:var(--blanco); color:var(--tinta); overflow:auto; }
+.lightbox-foto::backdrop { background:rgba(25,18,25,.82); backdrop-filter:blur(4px); }
+.lightbox-foto figure { margin:2em auto .5em; text-align:center; }
+.lightbox-foto figure img { max-width:100%; max-height:65vh; object-fit:contain; cursor:zoom-in; transition:transform .2s; }
+.lightbox-foto figure img.zoom-activo { transform:scale(1.5); cursor:zoom-out; }
+.lightbox-foto figcaption { margin-top:.7em; }
+.lightbox-foto button { margin:.25em; }
+.lightbox-cerrar { position:absolute; top:.5em; right:.5em; font-size:1.5em; padding:.2em .65em; }
+.lightbox-anterior, .lightbox-siguiente { font-size:1.8em; padding:.2em .7em; }
+.interacciones-lightbox { border-top:1px solid var(--rosa-suave); margin-top:.8em; padding-top:.8em; }
+.reacciones-lightbox { display:flex; gap:.35em; flex-wrap:wrap; }
+.reacciones-lightbox button { background:var(--crema); color:var(--tinta); padding:.5em .8em; }
+.comentarios-lightbox p { margin:.5em 0; }
+.form-comentario { display:flex; gap:.4em; }
+.form-comentario input { flex:1; min-width:0; border:1px solid var(--rosa-suave); border-radius:10px; padding:.65em; background:var(--crema); color:var(--tinta); }
+@media (max-width:600px) { .filtros-galeria { align-items:stretch; flex-direction:column; } .filtros-galeria select,.filtros-galeria input { width:100%; } }

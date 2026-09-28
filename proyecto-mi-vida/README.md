@@ -1,223 +1,66 @@
 # Proyecto Mi Vida 🤍
 
-Una página web romántica para celebrar el amor entre Joseph y Ohanna, con fotos, mensajes especiales, fechas importantes y música de fondo de YouTube.
+Sitio privado de recuerdos para Joseph y Ohanna: galería Supabase, música de YouTube y páginas para celebrar su historia.
 
-## 🎯 Novedades en esta versión
+> **Versión 1.1:** se trabaja en la rama `version1.1`. `main` y el despliegue actual no cambian hasta que revises y promociones la rama. Las funciones de Supabase nuevas requieren los pasos de [AUTENTICACION-V1.1.md](AUTENTICACION-V1.1.md).
 
-- **Música de fondo desde YouTube**: Reproduce automáticamente videos de YouTube como música de fondo con volumen medio en todas las páginas
-- **Base de datos Supabase**: Almacenamiento profesional de fotos en la nube (alternativa a Firebase)
-- **Celebración de cumpleaños**: Apartado especial que se activa el **11 de enero (Joseph)** y **7 de octubre (Ohanna)** a las 00:00h
-- **Aniversario**: Apartado especial para celebrar **1 año como enamorados el 1 de octubre** a las 00:00h
-- **Sistema de subida de fotos**: Añade nuevas fotos con título, descripción y fecha
-- **Estructura optimizada para Vercel**: Configuración lista para despliegue
+## Funciones
 
-## 📁 Estructura del Proyecto
+- Galería con ampliación, zoom, filtros por año/álbum/etiqueta y compartir por WhatsApp.
+- Álbumes personalizados, etiquetas, coordenadas y compresión de imágenes al subir.
+- Comentarios y reacciones en fotos para usuarios autenticados.
+- Reproductor de YouTube con playlist, pausa, volumen y canción siguiente/anterior.
+- Tema claro/oscuro, fondos de temporada, frases aleatorias, contador de días y transiciones.
+- Diario compartido, fechas especiales, recordatorios al visitar la página y exportación `.ics` compatible con Google Calendar.
+- Mapa OpenStreetMap configurable sin clave de Google.
+- Chat con notas de voz privadas y estadísticas de visitas por cuenta.
 
-```
-proyecto-mi-vida/
-├── index.html              # Login (Ohanna, Joseph o josephohanna)
-├── colage.html             # Galería de fotos con Supabase
-├── carta.html              # Carta de amor
-├── cumpleanos.html         # Celebra cumpleaños (NUEVO)
-├── aniversario.html        # Celebra aniversario (NUEVO)
-├── subir-foto.html          # Formulario para subir fotos (NUEVO)
-├── css/
-│   ├── style.css           # Estilos globales y colores
-│   ├── colage.css          # Estilos del colage
-│   ├── carta.css           # Estilos de la carta
-│   ├── celebraciones.css   # Estilos para cumpleaños/aniversario (NUEVO)
-│   └── subir-foto.css       # Estilos del formulario (NUEVO)
-├── js/
-│   ├── doodles.js          # SVG de perrito y pajarito
-│   ├── petalos.js          # Animación de flores cayendo
-│   ├── fotos-data.js       # Datos locales de ejemplo (respaldo)
-│   ├── colage.js           # Lógica del colage
-│   ├── supabase-config.js  # Configuración de Supabase (NUEVO)
-│   └── musica.js           # Módulo de música de YouTube (NUEVO)
-├── assets/
-│   └── fotos/               # Fotos del colage (opcional, para respaldo)
-├── package.json            # Dependencias para Vercel
-├── vercel.json             # Configuración de Vercel
-├── .gitignore              # Archivos ignorados
-└── README.md               # Este archivo
-```
+## Requisitos de la rama v1.1
 
-## 🚀 Cómo Empezar
+1. Crea dos cuentas para la pareja desde Supabase **Authentication → Users** y desactiva los registros públicos.
+2. Ejecuta `database/version1.1.sql` en el SQL Editor de Supabase. La migración añade las tablas y políticas para las nuevas funciones; conserva las políticas de fotos anónimas de la versión actual para que `main` siga funcionando durante la revisión.
+3. Publica la rama para generar un despliegue Preview:
 
-### Opción 1: Abrir localmente
-1. Abre `index.html` en tu navegador (doble clic)
-2. Ingresa uno de estos códigos: `Ohanna`, `Joseph` o `josephohanna`
-
-**Nota**: Para que Supabase y la música de YouTube funcionen, necesitas un servidor web. Usa:
-```bash
-npx serve
-# o
-python -m http.server 8000
-```
-
-### Opción 2: Desplegar en Vercel (Recomendado)
-
-1. **Configura Supabase**:
-   - Sigue las instrucciones en `EJEMPLO-SUPABASE.md`
-   - Crea un proyecto en [Supabase](https://supabase.com/)
-   - Configura el bucket y la tabla
-
-2. **Configura las credenciales:**
-   - Copia la URL y la clave anónima en `js/supabase-config.js`
-
-3. **Despliega:**
    ```bash
-   npm install -g vercel
-   vercel
+   git push -u origin version1.1
    ```
 
-4. **Sube fotos:**
-   - Ve a `subir-foto.html`
-   - Completa el formulario y sube tus imágenes
-   - Las fotos aparecerán automáticamente en el colage
+4. Prueba el Preview con ambas cuentas antes de fusionar la rama a `main`.
 
-## 🔥 Configuración de Supabase
+El login anterior era una clave visual; v1.1 requiere correo y contraseña de Supabase. Nunca pongas una clave `service_role` o `secret` en el navegador. Las cuentas se crean en el panel y la opción de registro público debe permanecer desactivada porque las tablas privadas permiten acceso a usuarios autenticados.
 
-1. Ve a [Supabase](https://supabase.com/) y crea un proyecto
-2. Configura Storage:
-   - Crea un bucket llamado `fotos`
-   - Activa "Public Access"
-3. Configura la base de datos:
-   - Crea una tabla llamada `fotos` con las columnas:
-     - `id` (UUID, primary key, default: gen_random_uuid())
-     - `titulo` (Text)
-     - `descripcion` (Text)
-     - `url` (Text)
-     - `alt` (Text)
-     - `frase` (Text)
-     - `fecha_subida` (Timestamp with time zone, default: now())
-4. Copia las credenciales en `js/supabase-config.js`
+El bucket actual `fotos` mantiene sus URLs públicas para no romper la galería existente; el inicio de sesión no vuelve privados esos archivos. Los comentarios, el chat, el diario y las estadísticas sí usan tablas protegidas por RLS.
 
-**Guía detallada:** Ver `EJEMPLO-SUPABASE.md`
+La migración afecta al proyecto Supabase donde la ejecutes, aunque es aditiva y conserva el acceso anónimo de fotos existente. Si tienes un proyecto de pruebas, úsalo primero.
 
-## 🎵 Música de Fondo desde YouTube
+## Calendario y mapa
 
-El proyecto usa la **API de YouTube IFrame Player** para reproducir música de fondo.
+La página de fechas descarga un archivo `.ics` que se puede importar en Google Calendar; no hay sincronización OAuth en vivo. Incluye recordatorios de un día antes. Las notificaciones del navegador aparecen cuando se visita la página de fechas y el navegador concede permiso.
 
-**Video configurado por defecto:** https://youtu.be/p_1Osm5xE5Y
+Para mostrar una ubicación en el mapa, al subir una foto indica el lugar y sus coordenadas. OpenStreetMap se abre sin API key.
 
-**Para cambiar el video:**
-1. Abre `js/musica.js`
-2. Cambia el valor de `YOUTUBE_VIDEO_ID`:
-```javascript
-const YOUTUBE_VIDEO_ID = 'TU_VIDEO_ID_AQUI';
+## Desarrollo local
+
+Sirve la carpeta del proyecto con un servidor local (no abras HTML directamente como `file://` porque se usan módulos ES):
+
+```bash
+python -m http.server 8000 --directory proyecto-mi-vida
 ```
 
-**Videos recomendados:**
-- `p_1Osm5xE5Y` - Video actual (alternativo)
-- `QAItMep0GiA` - Video original que mencionaste
+Luego abre `http://localhost:8000` y usa una de las dos cuentas de Supabase.
 
-**Características:**
-- Se reproduce automáticamente
-- Volumen medio (50%)
-- Loop infinito
-- Controles ocultos
-- Si falla el autoplay (por políticas del navegador), aparece un botón para iniciar manualmente
+## Despliegue
 
-## 📅 Fechas Especiales
+Vercel está configurado para publicar los HTML, CSS, JavaScript y recursos estáticos. El proyecto debe tener como Root Directory la carpeta `proyecto-mi-vida`. Los pushes a `version1.1` generan Preview; el dominio de producción se actualiza al promover los cambios a la rama configurada para Production.
 
-| Fecha | Evento | Se activa a las |
-|-------|--------|----------------|
-| 11 de enero | Cumpleaños de Joseph | 00:00h |
-| 7 de octubre | Cumpleaños de Ohanna | 00:00h |
-| 1 de octubre | Aniversario (1 año) | 00:00h |
+## Estructura relevante
 
-Estas páginas muestran contenido especial automáticamente en sus fechas correspondientes.
+- `index.html`: acceso con Supabase Auth.
+- `colage.html`: galería, filtros, lightbox, comentarios y reacciones.
+- `subir-foto.html`: subida, álbumes, etiquetas y ubicación.
+- `espacio.html`, `diario.html`, `fechas.html`, `mapa.html`, `chat.html`, `estadisticas.html`: módulos de la relación.
+- `js/supabase-config.js`: cliente público de Supabase.
+- `database/version1.1.sql`: migración manual y políticas RLS.
+- `AUTENTICACION-V1.1.md`: preparación de las dos cuentas.
 
-## 📸 Añadir Fotos
-
-### Método 1: Usando el formulario (Recomendado)
-1. Ve a `subir-foto.html`
-2. Completa:
-   - Título (obligatorio)
-   - Descripción (obligatorio)
-   - Foto (obligatorio, máximo 5MB)
-   - Frase de amor (opcional)
-   - Fecha (opcional)
-3. Haz clic en "Subir Foto"
-
-**Nota**: las fotos se suben a Supabase Storage y sus datos se guardan en la tabla `fotos`.
-
-**Seguridad**: el acceso de la portada es solo visual. Revisa `EJEMPLO-SUPABASE.md` antes de permitir subidas públicas; las políticas abiertas permiten que cualquier visitante use la API.
-
-### Método 2: Manual (sin Supabase)
-Edita `js/fotos-data.js` y añade tus fotos:
-```javascript
-{
-  src: "assets/fotos/tu-foto.jpg",
-  alt: "Descripción para accesibilidad",
-  descripcion: "Qué pasó en esta foto",
-  frase: "Frase de amor"
-}
-```
-
-## 🎨 Personalización
-
-### Cambiar colores
-Edita las variables CSS en `css/style.css`:
-```css
-:root {
-  --crema: #FFF8F3;
-  --rosa-suave: #F6C9D0;
-  --rosa-profundo: #E8A2B0;
-  /* ... */
-}
-```
-
-### Cambiar textos
-- Edita los archivos HTML directamente
-- Los mensajes de cumpleaños y aniversario están en sus respectivas páginas
-
-### Añadir más páginas
-1. Crea un nuevo archivo HTML (ej: `nuestra-historia.html`)
-2. Copia la estructura básica de `carta.html`
-3. Añade el enlace en la navegación de todas las páginas
-
-## 🛠 Requisitos para Vercel
-
-- Node.js 16 o superior
-- npm o yarn
-- Cuenta de Vercel (gratis)
-
-## ⚠️ Notas Importantes
-
-1. **Supabase es gratis** para pequeños proyectos (hasta 500MB de almacenamiento)
-2. **La música** usa la API de YouTube, no necesita archivos MP3 locales
-3. **Para producción**, configura políticas de seguridad (RLS) en Supabase
-4. **El login** es decorativo, no es autenticación real
-5. **Las fotos** se cargan primero de Supabase, si falla usa los datos locales
-
-## 🌟 Consejos
-
-- **Para mejores resultados**: Sube fotos con resolución mínima de 800x600px
-- **Nombres de archivos**: Usa nombres descriptivos (ej: `conierto-2025.jpg`)
-- **Tamaño máximo**: 5MB por foto (configurable en `subir-foto.html`)
-- **Formatos soportados**: JPG, PNG, WEBP
-- **Para la música**: Usa videos de YouTube que sean principalmente música sin voces
-
-## 🤝 ¿Cómo contribuir?
-
-Este proyecto es personal, pero si quieres ayudar:
-- Sugiere mejoras en el diseño
-- Añade más animaciones
-- Mejora la experiencia de usuario
-
-## 📄 Licencia
-
-MIT - Libre para uso personal. No uso comercial sin permiso.
-
----
-
-## 📚 Documentación Adicional
-
-- **EJEMPLO-SUPABASE.md**: Guía detallada para configurar Supabase
-- **CAMBIOS-REALIZADOS.md**: Resumen de todos los cambios realizados
-
----
-
-Hecho con ❤️ por Joseph para Ohanna
+Hecho con ❤️ por Joseph para Ohanna.

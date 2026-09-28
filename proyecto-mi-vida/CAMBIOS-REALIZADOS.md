@@ -1,3 +1,7 @@
+# Historial de cambios
+
+La descripción histórica de abajo corresponde a la versión anterior. La rama `version1.1` añade nuevas funciones y reemplaza el acceso de clave compartida con Supabase Auth. Para las instrucciones vigentes consulta `README.md` y `AUTENTICACION-V1.1.md`.
+
 # Cambios Realizados en Proyecto Mi Vida 📋
 
 ## 🎯 Resumen General

@@ -406,3 +406,7 @@
     grid-template-columns: 1fr;
   }
 }
+
+.coordenadas-lugar { display: grid; grid-template-columns: 1fr 1fr; gap: .6em; }
+.form-foto select, .form-foto input[type="text"], .form-foto input[type="number"] { width: 100%; padding: .8em 1em; border: 2px solid var(--rosa-suave); border-radius: 14px; background: var(--crema); color: var(--tinta); font: inherit; }
+@media (max-width: 520px) { .coordenadas-lugar { grid-template-columns: 1fr; } }

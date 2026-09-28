@@ -35,7 +35,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
  * @param {string} frase - Frase de amor (opcional)
  * @returns {Promise<Object>} - Objeto con la foto subida
  */
-export async function agregarFoto(file, titulo, descripcion, frase = '', fecha = '') {
+export async function agregarFoto(file, { titulo, descripcion, frase = '', fecha = '', album = 'General', etiquetas = [], ubicacion = '', latitud = null, longitud = null } = {}) {
   try {
     // Generar nombre único para el archivo
     const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
@@ -72,7 +72,12 @@ export async function agregarFoto(file, titulo, descripcion, frase = '', fecha =
         url: publicUrl,
         alt: `Foto de ${titulo}`,
         frase: frase || titulo,
-        fecha_subida: fechaSubida
+        fecha_subida: fechaSubida,
+        album,
+        etiquetas,
+        ubicacion: ubicacion || null,
+        latitud: latitud !== null && latitud !== undefined && latitud !== '' && Number.isFinite(Number(latitud)) ? Number(latitud) : null,
+        longitud: longitud !== null && longitud !== undefined && longitud !== '' && Number.isFinite(Number(longitud)) ? Number(longitud) : null
       }])
       .select();
     
@@ -118,10 +123,16 @@ export async function obtenerFotos() {
 export async function obtenerFotosParaColage() {
   const fotos = await obtenerFotos();
   return fotos.map(foto => ({
+    id: foto.id,
     src: foto.url,
     alt: foto.alt || foto.titulo,
     descripcion: foto.descripcion,
     frase: foto.frase || foto.titulo,
+    album: foto.album || 'General',
+    etiquetas: Array.isArray(foto.etiquetas) ? foto.etiquetas : [],
+    ubicacion: foto.ubicacion || '',
+    latitud: foto.latitud,
+    longitud: foto.longitud,
     fecha: new Date(foto.fecha_subida)
   }));
 }

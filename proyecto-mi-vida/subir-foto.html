@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>document.documentElement.classList.add('sesion-pendiente')</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Subir Foto 📷</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/subir-foto.css">
+  <script type="module" src="js/app-shell.js"></script>
 </head>
 <body>
 
@@ -38,6 +40,24 @@
       <p class="ayuda">Esta descripción aparecerá en el colage.</p>
     </div>
     
+    <div class="campo-form">
+      <label for="album">Álbum</label>
+      <input id="album" name="album" list="albumes-sugeridos" maxlength="80" value="General" placeholder="Ej: Viajes">
+      <datalist id="albumes-sugeridos"><option value="General"><option value="Viajes"><option value="Cumpleaños"><option value="Aniversarios"><option value="Momentos especiales"></datalist>
+    </div>
+    <div class="campo-form">
+      <label for="etiquetas">Etiquetas</label>
+      <input type="text" id="etiquetas" name="etiquetas" maxlength="200" placeholder="playa, primera cita, familia">
+      <p class="ayuda">Sepáralas con comas.</p>
+    </div>
+    <div class="campo-form">
+      <label for="ubicacion">Lugar del recuerdo (opcional)</label>
+      <input type="text" id="ubicacion" name="ubicacion" maxlength="120" placeholder="Lima, Perú">
+      <div class="coordenadas-lugar">
+        <input type="number" id="latitud" name="latitud" step="any" min="-90" max="90" placeholder="Latitud">
+        <input type="number" id="longitud" name="longitud" step="any" min="-180" max="180" placeholder="Longitud">
+      </div>
+    </div>
     <div class="campo-form">
       <label for="foto">Selecciona una foto *</label>
       <div class="area-arrastrar" id="area-arrastrar">
@@ -102,6 +122,7 @@
 <script type="module" src="js/musica.js"></script>
 <script type="module">
   import { agregarFoto, obtenerFotos } from './js/supabase-config.js';
+  import { comprimirImagen } from './js/image-utils.js';
 
   // Inicializar
   document.getElementById('doodle-header').innerHTML = svgPajarito(35) + svgLirio(45) + svgPerrito(60) + svgLirio(45) + svgPajarito(35);
@@ -239,6 +260,11 @@
     const descripcion = document.getElementById('descripcion').value.trim();
     const frase = document.getElementById('frase').value.trim();
     const fecha = document.getElementById('fecha').value;
+    const album = document.getElementById('album').value;
+    const etiquetas = document.getElementById('etiquetas').value.split(',').map(tag => tag.trim()).filter(Boolean).slice(0, 12);
+    const ubicacion = document.getElementById('ubicacion').value.trim();
+    const latitud = document.getElementById('latitud').value;
+    const longitud = document.getElementById('longitud').value;
     
     try {
       // Mostrar progreso
@@ -248,10 +274,12 @@
       btnSubir.disabled = true;
       
       // Subir a Supabase
-      textoProgreso.textContent = 'Subiendo foto a Supabase...';
+      textoProgreso.textContent = 'Optimizando imagen…';
+      const fotoOptimizada = await comprimirImagen(archivoSeleccionado);
+      textoProgreso.textContent = fotoOptimizada === archivoSeleccionado ? 'Subiendo foto a Supabase…' : 'Imagen comprimida. Subiendo…';
       progreso.style.width = '30%';
       
-      const resultado = await agregarFoto(archivoSeleccionado, titulo, descripcion, frase, fecha);
+      await agregarFoto(fotoOptimizada, { titulo, descripcion, frase, fecha, album, etiquetas, ubicacion, latitud, longitud });
       
       progreso.style.width = '100%';
       textoProgreso.textContent = '¡Foto subida!';
