@@ -1,0 +1,12 @@
+.aniversario-pagina{position:relative;z-index:2;width:min(1080px,calc(100% - 2rem));margin:1rem auto 4rem}
+.aniversario-hero{background:radial-gradient(ellipse at top,#fbe1eb 0,rgba(255,255,255,.96) 65%);transition:background .5s ease,box-shadow .5s ease,border-color .5s ease}
+.es-aniversario-hoy .aniversario-hero{background:radial-gradient(ellipse at top,#ffe2e8 0,#fff7ed 68%);border-color:#e89bad;box-shadow:0 18px 60px rgba(218,116,145,.3)}
+.reloj-aniversario{display:flex;justify-content:center;gap:clamp(.5rem,2vw,1rem);margin:1.3rem auto .5rem;flex-wrap:wrap}
+.reloj-aniversario[hidden]{display:none}
+.reloj-aniversario>div{min-width:84px;padding:.7rem .9rem;border:1px solid #f1c7d0;border-radius:16px;background:#fff;box-shadow:0 5px 16px rgba(71,47,56,.07);display:grid;gap:.1rem}
+.reloj-aniversario strong{font-size:clamp(1.6rem,5vw,2.4rem);line-height:1;color:#b86278}
+.reloj-aniversario span{font-size:.78rem;color:#79656c}
+.aniversario-zona{font-size:.88rem;color:#836b73;margin:.6rem 0}
+.aniversario-anios{font-weight:700;color:#9b586d;margin:.7rem 0 0}
+.es-aniversario-hoy .cumple-etiqueta{color:#a9536e}
+@media(max-width:760px){.aniversario-pagina{width:min(100% - 1rem,1080px)}}
